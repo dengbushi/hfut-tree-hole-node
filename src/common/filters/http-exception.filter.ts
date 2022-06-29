@@ -11,8 +11,6 @@ export class HttpExceptionFilter<T extends HttpException> implements ExceptionFi
     const status = exception.getStatus()
     const exceptionResponse = exception.getResponse()
 
-    console.log(exceptionResponse)
-
     const error
       = isString(exceptionResponse)
         ? { msg: exceptionResponse }

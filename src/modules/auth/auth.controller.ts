@@ -1,4 +1,4 @@
-import { Controller, Inject, Post, Query, UseGuards } from '@nestjs/common'
+import { Body, Controller, Inject, Post, UseGuards } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { LoginQueryDto } from './dto/loginQuery.dto'
 import { LocalAuthGuard } from './local-auth.guard'
@@ -11,12 +11,12 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('/login')
-  login(@Query() dto: LoginQueryDto) {
-    return this.authService.login(dto)
+  login(@Body() loginQueryDto: LoginQueryDto) {
+    return this.authService.login(loginQueryDto)
   }
 
   @Post('/register')
-  register(@Query() dto: RegisterQueryDto) {
-    return this.authService.register(dto)
+  register(@Body() registerQueryDto: RegisterQueryDto) {
+    return this.authService.register(registerQueryDto)
   }
 }

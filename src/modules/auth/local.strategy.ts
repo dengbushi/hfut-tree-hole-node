@@ -1,25 +1,25 @@
 import { PassportStrategy } from '@nestjs/passport'
 import { Strategy } from 'passport-local'
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common'
-import { AuthService } from './auth.service'
-import { LoginQueryDto } from './dto/loginQuery.dto'
+import { Inject, Injectable, NotFoundException } from '@nestjs/common'
+import { UserService } from '../user/user.service'
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
   @Inject()
-  private readonly authService: AuthService
+  private readonly userService: UserService
 
   constructor() {
     super({
       usernameField: 'studentId',
+      passwordField: 'password',
     })
   }
 
   // 验证是否是第一次登录
-  async validate(dto: LoginQueryDto) {
-    const user = await this.authService.isUserExist(dto)
+  async validate(studentId: number) {
+    const user = await this.userService.findOne(studentId)
     if (!user) {
-      throw new UnauthorizedException('用户未注册')
+      throw new NotFoundException('用户未注册')
     }
     return user
   }

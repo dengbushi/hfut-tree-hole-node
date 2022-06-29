@@ -1,7 +1,6 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
-import { WrapResponseInterceptor } from './common/interceptors/wrap-response.interceptor'
 import { HttpExceptionFilter } from './common/filters/http-exception.filter'
 
 function setupGlobalHandler(app: INestApplication) {
@@ -9,7 +8,6 @@ function setupGlobalHandler(app: INestApplication) {
   app.useGlobalFilters(new HttpExceptionFilter())
 
   // interceptors
-  app.useGlobalInterceptors(new WrapResponseInterceptor())
 
   // pipes
   app.useGlobalPipes(
