@@ -1,4 +1,4 @@
-import { IsNumber, IsString, Length } from 'class-validator'
+import { IsNotEmpty, IsNumber, IsString, Length } from 'class-validator'
 import { NumberLength } from '../../../common/decorators/NumberLength.decorator'
 
 export class LoginQueryDto {
@@ -15,6 +15,9 @@ export class LoginQueryDto {
   })
   @Length(6, 20, {
     message: '密码只能为6-20位长度',
+  })
+  @IsNotEmpty({
+    message: '密码不能为空',
   })
     password: string
 }
