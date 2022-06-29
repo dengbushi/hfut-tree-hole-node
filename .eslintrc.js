@@ -11,7 +11,7 @@ module.exports = {
     node: true,
     jest: true,
   },
-  ignorePatterns: ['.eslintrc.js', '/^(.*).entity.ts$/', '/^(.*).dto.ts$/'],
+  ignorePatterns: ['.eslintrc.js'],
   'overrides': [{
     "files": ["*"],
     "rules": {
@@ -20,7 +20,7 @@ module.exports = {
       "brace-style": [2, "1tbs", { "allowSingleLine": true }],
       "no-useless-return": "off",
       "prefer-const": "off",
-      'indent': [2, 0],
+      'indent': [2, 2, { 'SwitchCase': 1 }],
       "no-unused-expressions": "off",
       "@typescript-eslint/no-unused-vars": "off", // If open this, it will create some unexpected errors
       "no-unused-vars": "error", // best choice
