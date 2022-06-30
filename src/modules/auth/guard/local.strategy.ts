@@ -1,6 +1,7 @@
 import { PassportStrategy } from '@nestjs/passport'
 import { Strategy } from 'passport-local'
-import { Inject, Injectable, NotFoundException } from '@nestjs/common'
+import { Inject, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common'
+import { isString } from 'class-validator'
 import { UserService } from '../../user/user.service'
 
 @Injectable()
@@ -17,6 +18,9 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 
   // 验证是否是第一次登录
   async validate(studentId: number) {
+    if (isString(studentId)) {
+      throw new NotAcceptableException('学号格式错误')
+    }
     const user = await this.userService.findOne(studentId)
     if (!user) {
       throw new NotFoundException('用户未注册')

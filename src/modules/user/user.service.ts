@@ -13,6 +13,8 @@ export class UserService {
   async findOne(payload: number | LoginQueryDto) {
     let user: UserEntity
 
+    console.log(payload)
+
     if (isNumber(payload)) {
       user = await this.userRepository.findOne({
         where: { studentId: payload },
