@@ -2,6 +2,7 @@ import { Inject, Injectable, NotAcceptableException, UnauthorizedException } fro
 import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 import { AxiosError } from 'axios'
+import { JwtService } from '@nestjs/jwt'
 import { UserService } from '../user/user.service'
 import { createResponse } from '../../shared/utils/create'
 import { UserEntity } from '../../entity/user/user.entity'
@@ -14,6 +15,9 @@ export class AuthService {
   @Inject()
   private readonly userService: UserService
 
+  @Inject()
+  private readonly jwtService: JwtService
+
   @InjectRepository(UserEntity)
   private readonly userRepository: Repository<UserEntity>
 
@@ -23,7 +27,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('密码错误')
     } else {
-      return createResponse('登录成功')
+      return createResponse('登录成功', { token: this.signToken(user.studentId) })
     }
   }
 
@@ -45,7 +49,11 @@ export class AuthService {
     )
 
     if (user) {
-      return createResponse('注册成功')
+      return createResponse('注册成功', { token: this.signToken(user.studentId) })
     }
+  }
+
+  signToken(studentId: number) {
+    return this.jwtService.sign({ studentId })
   }
 }

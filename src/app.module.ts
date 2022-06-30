@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { AuthModule } from './modules/auth/auth.module'
 import { UserModule } from './modules/user/user.module'
+import { CommonModule } from './common/common.module';
 import databaseConfig from './config/database.config'
 
 @Module({
@@ -18,6 +19,7 @@ import databaseConfig from './config/database.config'
       envFilePath: '.env',
       load: [databaseConfig],
     }),
+    CommonModule,
   ],
   controllers: [],
   providers: [],
