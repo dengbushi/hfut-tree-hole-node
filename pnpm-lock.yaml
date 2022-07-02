@@ -31,6 +31,7 @@ specifiers:
   eslint-plugin-prettier: ^4.0.0
   eslint-plugin-promise: ^6.0.0
   format: ^0.2.2
+  helmet: ^5.1.0
   jest: ^27.2.5
   mysql: ^2.18.1
   passport: ^0.5.2
@@ -68,6 +69,7 @@ dependencies:
   class-transformer: 0.5.1
   class-validator: 0.13.2
   format: 0.2.2
+  helmet: 5.1.0
   mysql: 2.18.1
   passport: 0.5.2
   passport-jwt: 4.0.0
@@ -3675,6 +3677,11 @@ packages:
     dependencies:
       function-bind: 1.1.1
     dev: true
+
+  /helmet/5.1.0:
+    resolution: {integrity: sha512-klsunXs8rgNSZoaUrNeuCiWUxyc+wzucnEnFejUg3/A+CaF589k9qepLZZ1Jehnzig7YbD4hEuscGXuBY3fq+g==}
+    engines: {node: '>=12.0.0'}
+    dev: false
 
   /hexoid/1.0.0:
     resolution: {integrity: sha512-QFLV0taWQOZtvIRIAdBChesmogZrtuXvVWsFHZTk2SU+anspqZ2vMnoLg7IE1+Uk16N19APic1BuF8bC8c2m5g==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npm.taobao.org/hexoid/-/hexoid-1.0.0.tgz}

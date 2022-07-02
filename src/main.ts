@@ -1,5 +1,6 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
+import helmet from 'helmet'
 import { AppModule } from './app.module'
 import { HttpExceptionFilter } from './common/filters/http-exception.filter'
 
@@ -24,6 +25,8 @@ function setupGlobalHandler(app: INestApplication) {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
+
+  app.use(helmet.xssFilter())
 
   app.enableCors({
     origin: '*',
