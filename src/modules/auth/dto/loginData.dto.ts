@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsNumber, IsString, Length } from 'class-validator'
 import { NumberLength } from '../../../common/decorators/NumberLength.decorator'
 
-export class LoginQueryDto {
+export class LoginDataDto {
   @IsNumber({
     allowNaN: false,
   }, {

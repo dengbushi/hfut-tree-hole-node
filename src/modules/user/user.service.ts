@@ -2,18 +2,17 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { UserEntity } from '../../entity/user/user.entity'
-import { LoginQueryDto } from '../auth/dto/loginQuery.dto'
+import { LoginDataDto } from '../auth/dto/loginData.dto'
 import { isNumber } from '../../shared/utils/is'
+import { RegisterDataDto } from '../auth/dto/registerData.dto'
 
 @Injectable()
 export class UserService {
   @InjectRepository(UserEntity)
   private readonly userRepository: Repository<UserEntity>
 
-  async findOne(payload: number | LoginQueryDto) {
+  async findOne(payload: number | Partial<LoginDataDto> | Partial<RegisterDataDto>) {
     let user: UserEntity
-
-    console.log(payload)
 
     if (isNumber(payload)) {
       user = await this.userRepository.findOne({

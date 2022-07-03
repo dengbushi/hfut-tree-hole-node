@@ -1,30 +1,30 @@
-import { Body, Controller, Get, Inject, Post, UseGuards } from '@nestjs/common'
+import { Body, Controller, Inject, Post, UseGuards } from '@nestjs/common'
 import { Public } from '../../common/decorators/public.decorator'
 import { AuthService } from './auth.service'
-import { LoginQueryDto } from './dto/loginQuery.dto'
+import { LoginDataDto } from './dto/loginData.dto'
 import { LocalAuthGuard } from './guard/local-auth.guard'
-import { RegisterQueryDto } from './dto/registerQuery.dto'
+import { RegisterDataDto } from './dto/registerData.dto'
+import { ForgetDataDto } from './dto/forgetData.dto'
 
+@Public()
 @Controller('auth')
 export class AuthController {
   @Inject()
   private readonly authService: AuthService
 
-  @Public()
   @UseGuards(LocalAuthGuard)
   @Post('/login')
-  login(@Body() loginQueryDto: LoginQueryDto) {
-    return this.authService.login(loginQueryDto)
+  login(@Body() loginDataDto: LoginDataDto) {
+    return this.authService.login(loginDataDto)
   }
 
-  @Public()
   @Post('/register')
-  register(@Body() registerQueryDto: RegisterQueryDto) {
-    return this.authService.register(registerQueryDto)
+  register(@Body() registerDataDto: RegisterDataDto) {
+    return this.authService.register(registerDataDto)
   }
 
-  @Get('/test')
-  test() {
-    return 'test'
+  @Post('/forget')
+  forget(@Body() forgetDataDto: ForgetDataDto) {
+    return this.authService.forget(forgetDataDto)
   }
 }

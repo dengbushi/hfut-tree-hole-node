@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsString, Length } from 'class-validator'
-import { LoginQueryDto } from './loginQuery.dto'
+import { HfutPasswordDto } from './hfutPassword.dto'
 
-export class RegisterQueryDto extends LoginQueryDto {
+export class RegisterDataDto extends HfutPasswordDto {
   @IsString()
   @IsNotEmpty({
     message: '用户名不能为空',

@@ -1,14 +1,14 @@
 import { Inject, Injectable, NotAcceptableException, UnauthorizedException } from '@nestjs/common'
 import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
-import { AxiosError } from 'axios'
 import { JwtService } from '@nestjs/jwt'
 import { UserService } from '../user/user.service'
 import { createResponse } from '../../shared/utils/create'
 import { UserEntity } from '../../entity/user/user.entity'
 import { loginVerifyRequest } from '../../request/loginVerify'
-import { LoginQueryDto } from './dto/loginQuery.dto'
-import { RegisterQueryDto } from './dto/registerQuery.dto'
+import { LoginDataDto } from './dto/loginData.dto'
+import { RegisterDataDto } from './dto/registerData.dto'
+import { ForgetDataDto } from './dto/forgetData.dto'
 
 @Injectable()
 export class AuthService {
@@ -21,7 +21,7 @@ export class AuthService {
   @InjectRepository(UserEntity)
   private readonly userRepository: Repository<UserEntity>
 
-  async login(dto: LoginQueryDto) {
+  async login(dto: LoginDataDto) {
     const user = await this.userService.findOne(dto)
 
     if (!user) {
@@ -31,18 +31,20 @@ export class AuthService {
     }
   }
 
-  async register(dto: RegisterQueryDto) {
+  async register(dto: RegisterDataDto) {
     const isUserExisted = await this.userService.findOne(dto.studentId)
-
     if (isUserExisted) {
-      throw new NotAcceptableException('用户已存在')
+      throw new NotAcceptableException('这个学号已经被注册了')
     }
 
-    try {
-      await loginVerifyRequest(dto)
-    } catch (err) {
-      throw new NotAcceptableException((err as AxiosError).response?.data?.msg || '登录验证请求错误')
+    const isUsernameExisted = await this.userService.findOne({
+      username: dto.username,
+    })
+    if (isUsernameExisted) {
+      throw new NotAcceptableException('嗨嗨嗨，换个名字吧，这个已经被注册了')
     }
+
+    await this.verifyHfutAccount(dto)
 
     const user = await this.userRepository.save(
       this.userRepository.create({ ...dto }),
@@ -53,7 +55,37 @@ export class AuthService {
     }
   }
 
+  async forget(forgetDataDto: ForgetDataDto) {
+    const isUserExisted = await this.userService.findOne(forgetDataDto.studentId)
+    if (!isUserExisted) {
+      throw new NotAcceptableException('该学号未注册')
+    }
+
+    await this.verifyHfutAccount(forgetDataDto)
+
+    const updatedUser = await this.userRepository.update(this.userRepository.create({
+      studentId: forgetDataDto.studentId,
+    }), { password: forgetDataDto.password })
+
+    if (updatedUser) {
+      return createResponse('修改密码成功', { token: this.signToken(forgetDataDto.studentId), updatedUser })
+    } else {
+      throw new NotAcceptableException('修改密码失败')
+    }
+  }
+
   signToken(studentId: number) {
     return this.jwtService.sign({ studentId })
+  }
+
+  async verifyHfutAccount(dto: RegisterDataDto | ForgetDataDto) {
+    try {
+      await loginVerifyRequest({
+        studentId: dto.studentId,
+        hfutPassword: dto.hfutPassword,
+      } as RegisterDataDto)
+    } catch (err) {
+      throw new NotAcceptableException('信息门户登录验证请求错误')
+    }
   }
 }

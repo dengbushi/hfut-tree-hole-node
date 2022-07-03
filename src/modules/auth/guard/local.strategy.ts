@@ -21,7 +21,9 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     if (isString(studentId)) {
       throw new NotAcceptableException('学号格式错误')
     }
+
     const user = await this.userService.findOne(studentId)
+
     if (!user) {
       throw new NotFoundException('用户未注册')
     }
