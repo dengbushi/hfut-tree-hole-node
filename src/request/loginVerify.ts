@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { RegisterDataDto } from '../modules/auth/dto/registerData.dto'
 
-const url = 'http://81.68.170.254:8082/login/verify'
+const url = 'https://service-lqt2n98h-1251811980.sh.apigw.tencentcs.com'
 
 export function loginVerifyRequest(registerQueryDto: RegisterDataDto) {
   return axios.get(url, {

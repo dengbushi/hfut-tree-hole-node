@@ -1,27 +1,23 @@
 import { Injectable } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { UserEntity } from '../../entity/user/user.entity'
+import { InjectModel } from '@nestjs/mongoose'
+import { Model } from 'mongoose'
 import { LoginDataDto } from '../auth/dto/loginData.dto'
 import { isNumber } from '../../shared/utils/is'
 import { RegisterDataDto } from '../auth/dto/registerData.dto'
+import { Users, UsersDocument } from '../../entity/user/user.entity'
 
 @Injectable()
 export class UserService {
-  @InjectRepository(UserEntity)
-  private readonly userRepository: Repository<UserEntity>
+  @InjectModel(Users.name)
+  private readonly usersModel: Model<UsersDocument>
 
   async findOne(payload: number | Partial<LoginDataDto> | Partial<RegisterDataDto>) {
-    let user: UserEntity
+    let user: Users
 
     if (isNumber(payload)) {
-      user = await this.userRepository.findOne({
-        where: { studentId: payload },
-      })
+      user = await this.usersModel.findOne({ studentId: payload }).exec()
     } else {
-      user = await this.userRepository.findOne({
-        where: payload,
-      })
+      user = await this.usersModel.findOne({ ...payload }).exec()
     }
 
     return user

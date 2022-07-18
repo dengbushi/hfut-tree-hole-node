@@ -1,25 +1,18 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm'
-import { IsNotEmpty, IsString } from 'class-validator'
-import { CommonEntity } from '../../common/entity/common.entity'
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import { Document } from 'mongoose'
 
-@Entity('user')
-export class UserEntity extends CommonEntity {
-  @PrimaryColumn({
-    comment: '绑定的学号',
-  })
+export type UsersDocument =Users & Document
+
+@Schema()
+export class Users {
+  @Prop()
     studentId: number
 
-  @Column({
-    comment: '用户名',
-  })
-  @IsNotEmpty()
-  @IsString()
+  @Prop()
     username: string
 
-  @Column({
-    comment: '登录密码',
-  })
-  @IsNotEmpty()
-  @IsString()
+  @Prop()
     password: string
 }
+
+export const UsersSchema = SchemaFactory.createForClass(Users)

@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common'
 import { PassportModule } from '@nestjs/passport'
-import { TypeOrmModule } from '@nestjs/typeorm'
 import { JwtModule } from '@nestjs/jwt'
 import { ConfigModule, ConfigService } from '@nestjs/config'
+import { MongooseModule } from '@nestjs/mongoose'
 import { UserModule } from '../user/user.module'
-import { UserEntity } from '../../entity/user/user.entity'
+import { Users, UsersSchema } from '../../entity/user/user.entity'
 import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
 import { LocalStrategy } from './guard/local.strategy'
@@ -14,7 +14,7 @@ import { JwtStrategy } from './guard/jwt.strategy'
   imports: [
     UserModule,
     PassportModule,
-    TypeOrmModule.forFeature([UserEntity]),
+    MongooseModule.forFeature([{ name: Users.name, schema: UsersSchema }]),
     ConfigModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

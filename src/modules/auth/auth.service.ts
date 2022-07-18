@@ -1,10 +1,10 @@
 import { Inject, Injectable, NotAcceptableException, UnauthorizedException } from '@nestjs/common'
-import { Repository } from 'typeorm'
-import { InjectRepository } from '@nestjs/typeorm'
 import { JwtService } from '@nestjs/jwt'
+import { InjectModel } from '@nestjs/mongoose'
+import { Model } from 'mongoose'
 import { UserService } from '../user/user.service'
 import { createResponse } from '../../shared/utils/create'
-import { UserEntity } from '../../entity/user/user.entity'
+import { Users, UsersDocument } from '../../entity/user/user.entity'
 import { loginVerifyRequest } from '../../request/loginVerify'
 import { LoginDataDto } from './dto/loginData.dto'
 import { RegisterDataDto } from './dto/registerData.dto'
@@ -18,8 +18,8 @@ export class AuthService {
   @Inject()
   private readonly jwtService: JwtService
 
-  @InjectRepository(UserEntity)
-  private readonly userRepository: Repository<UserEntity>
+  @InjectModel(Users.name)
+  private readonly userModel: Model<UsersDocument>
 
   async login(dto: LoginDataDto) {
     const user = await this.userService.findOne(dto)
@@ -46,16 +46,14 @@ export class AuthService {
 
     await this.verifyHfutAccount(dto)
 
-    const user = await this.userRepository.save(
-      this.userRepository.create({ ...dto }),
-    )
+    const user = await new this.userModel(dto).save()
 
     if (user) {
       return createResponse('注册成功', { token: this.signToken(user.studentId) })
     }
   }
 
-  async forget(forgetDataDto: ForgetDataDto) {
+  async forget(forgetDataDto: ForgetDataDto): Promise<any> {
     const isUserExisted = await this.userService.findOne(forgetDataDto.studentId)
     if (!isUserExisted) {
       throw new NotAcceptableException('该学号未注册')
@@ -63,9 +61,7 @@ export class AuthService {
 
     await this.verifyHfutAccount(forgetDataDto)
 
-    const updatedUser = await this.userRepository.update(this.userRepository.create({
-      studentId: forgetDataDto.studentId,
-    }), { password: forgetDataDto.password })
+    const updatedUser = await this.userModel.updateOne({ studentId: forgetDataDto.studentId }, { password: forgetDataDto.password })
 
     if (updatedUser) {
       return createResponse('修改密码成功', { token: this.signToken(forgetDataDto.studentId), updatedUser })
@@ -79,13 +75,13 @@ export class AuthService {
   }
 
   async verifyHfutAccount(dto: RegisterDataDto | ForgetDataDto) {
-    try {
-      await loginVerifyRequest({
-        studentId: dto.studentId,
-        hfutPassword: dto.hfutPassword,
-      } as RegisterDataDto)
-    } catch (err) {
-      throw new NotAcceptableException('信息门户登录验证请求错误')
-    }
+    // try {
+    //   await loginVerifyRequest({
+    //     studentId: dto.studentId,
+    //     hfutPassword: dto.hfutPassword,
+    //   } as RegisterDataDto)
+    // } catch (err) {
+    //   throw new NotAcceptableException('信息门户登录验证请求错误')
+    // }
   }
 }
