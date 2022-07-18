@@ -29,6 +29,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new NotAcceptableException()
     }
 
-    return true
+    return payload
   }
 }
