@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose'
 import { TreeholeMode, TreeholeModeSchema } from '../../schema/treeholeMode.schema'
 import { TreeholeController } from './treehole.controller'
 import { TreeholeService } from './treehole.service'
+import { IsModeExist } from './dto/treehole.dto'
 
 @Module({
   imports: [
@@ -11,6 +12,6 @@ import { TreeholeService } from './treehole.service'
     ]),
   ],
   controllers: [TreeholeController],
-  providers: [TreeholeService],
+  providers: [TreeholeService, IsModeExist],
 })
 export class TreeholeModule {}

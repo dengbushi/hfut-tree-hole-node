@@ -5,6 +5,7 @@ import * as _ from 'lodash'
 import { isEmpty } from 'lodash'
 import { TreeholeMode, TreeholeModeDocument, treeholeModeDefaultData } from '../../schema/treeholeMode.schema'
 import { createResponse } from '../../shared/utils/create'
+import { TreeholeDetailDto, TreeholeListDto } from './dto/treehole.dto'
 
 @Injectable()
 export class TreeholeService {
@@ -35,29 +36,21 @@ export class TreeholeService {
     return createResponse('获取树洞模式成功', modes)
   }
 
-  async getList() {
+  async getList(dto: TreeholeListDto) {
     return createResponse('获取树洞列表成功', [
       {
         desc: 'Hello World!',
         id: '1',
         createTime: '22/07/01',
-        reply: 464,
-        stars: 361,
-        imgs: [],
-      },
-      {
-        desc: '#吐槽个渣女 每次都背着我不知道去哪儿鬼混，前前后后已经因为这个第七次分手了，每次走之前还都把我钱包里钱带走，吐了',
-        id: '62928',
-        createTime: '22/07/05',
-        reply: 464,
+        comments: 464,
         stars: 361,
         imgs: [],
       },
       {
         desc: '如果这个洞在开学前能刷到zombiezach，那dz开学请所有人吃火锅',
-        id: '2232',
+        id: '22as32',
         createTime: '22/06/25',
-        reply: 464,
+        comments: 464,
         stars: 361,
         imgs: ['https://www.steamxo.com/wp-content/uploads/2019/11/O77IpL211919_851218.jpg'],
       },
@@ -76,13 +69,28 @@ export class TreeholeService {
           + '#16977#509讲课好的老师\n'
           + '#5030#512上一个\n'
           + '的镜像\n',
-        id: '789',
+        id: '78asf9',
         createTime: '22/06/15',
-        reply: 464,
+        commentsNum: 464,
         stars: 361,
         imgs: [],
       },
 
     ])
+  }
+
+  async getDetail(dto: TreeholeDetailDto) {
+    return createResponse('获取树洞详情成功', {
+      desc: 'Hello World!',
+      id: '1',
+      createTime: '22/07/01',
+      commentsNum: 464,
+      stars: 361,
+      comments: [
+        { avatar: '', isHost: true, content: 'Hello World!', createTime: '22/07/01 18:06:53', username: 'Alice' },
+        { avatar: '', isHost: false, content: '打卡', createTime: '22/07/01 18:09:54', username: 'Alice' },
+      ],
+      imgs: [],
+    })
   }
 }

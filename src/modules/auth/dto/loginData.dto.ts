@@ -1,7 +1,11 @@
 import { IsNotEmpty, IsNumber, IsString, Length } from 'class-validator'
+import { ApiProperty } from '@nestjs/swagger'
 import { NumberLength } from '../../../common/decorators/NumberLength.decorator'
 
 export class LoginDataDto {
+  @ApiProperty({
+    description: '学号',
+  })
   @IsNumber({
     allowNaN: false,
   }, {
@@ -12,6 +16,9 @@ export class LoginDataDto {
   })
     studentId: number
 
+  @ApiProperty({
+    description: '树洞密码',
+  })
   @IsString({
     message: '密码必须是字符串',
   })
