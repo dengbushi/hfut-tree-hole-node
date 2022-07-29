@@ -2,9 +2,11 @@ import { Inject, Injectable, NotAcceptableException, UnauthorizedException } fro
 import { JwtService } from '@nestjs/jwt'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
+import { ConfigService } from '@nestjs/config'
+import { AxiosError } from 'axios'
 import { UserService } from '../user/user.service'
 import { createResponse } from '../../shared/utils/create'
-import { Users, UsersDocument } from '../../entity/user/user.entity'
+import { Roles, Users, UsersDocument } from '../../schema/user.schema'
 import { loginVerifyRequest } from '../../request/loginVerify'
 import { LoginDataDto } from './dto/loginData.dto'
 import { RegisterDataDto } from './dto/registerData.dto'
@@ -17,6 +19,9 @@ export class AuthService {
 
   @Inject()
   private readonly jwtService: JwtService
+
+  @Inject()
+  private readonly configService: ConfigService
 
   @InjectModel(Users.name)
   private readonly userModel: Model<UsersDocument>
@@ -46,7 +51,10 @@ export class AuthService {
 
     await this.verifyHfutAccount(dto)
 
-    const user = await new this.userModel(dto).save()
+    const user = await new this.userModel({
+      ...dto,
+      role: Roles.steve,
+    }).save()
 
     if (user) {
       return createResponse('注册成功', { token: this.signToken(user.studentId) })
@@ -75,13 +83,14 @@ export class AuthService {
   }
 
   async verifyHfutAccount(dto: RegisterDataDto | ForgetDataDto) {
-    // try {
-    //   await loginVerifyRequest({
-    //     studentId: dto.studentId,
-    //     hfutPassword: dto.hfutPassword,
-    //   } as RegisterDataDto)
-    // } catch (err) {
-    //   throw new NotAcceptableException('信息门户登录验证请求错误')
-    // }
+    try {
+      await loginVerifyRequest(`${this.configService.get('HFUTAPI_URL')}/login/verify`, {
+        studentId: dto.studentId,
+        hfutPassword: dto.hfutPassword,
+      } as RegisterDataDto)
+    } catch (err) {
+      const msg = (err as AxiosError).response?.data?.msg
+      throw new NotAcceptableException(`信息门户${msg || '登录验证请求错误'}`)
+    }
   }
 }
