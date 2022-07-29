@@ -4,6 +4,8 @@ import { MongooseModule } from '@nestjs/mongoose'
 import { AuthModule } from './modules/auth/auth.module'
 import { UserModule } from './modules/user/user.module'
 import { CommonModule } from './common/common.module'
+import { CaslModule } from './modules/casl/casl.module'
+import { TreeholeModule } from './modules/treehole/treehole.module'
 import databaseConfig from './config/database.config'
 
 @Module({
@@ -22,6 +24,8 @@ import databaseConfig from './config/database.config'
       load: [databaseConfig],
     }),
     CommonModule,
+    CaslModule,
+    TreeholeModule,
   ],
   controllers: [],
   providers: [],
