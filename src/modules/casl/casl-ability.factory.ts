@@ -1,6 +1,6 @@
 import { Ability, AbilityBuilder, AbilityClass, ExtractSubjectType, InferSubjects } from '@casl/ability'
 import { Injectable } from '@nestjs/common'
-import { Users as User } from '../../schema/user.schema'
+import { Users as User } from '../../schema/user/user.schema'
 
 export enum Action {
   Manage = 'manage',

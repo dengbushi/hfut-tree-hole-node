@@ -1,7 +1,8 @@
-import { Controller, Get, Inject, Query } from '@nestjs/common'
+import { Body, Controller, Get, Inject, Post, Query, Req } from '@nestjs/common'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
+import { IRequestHeaderUserData } from '../auth/guard/type'
 import { TreeholeService } from './treehole.service'
-import { TreeholeDetailDto, TreeholeListDto } from './dto/treehole.dto'
+import { CreateHoleDto, TreeholeDetailDto, TreeholeListDto } from './dto/treehole.dto'
 
 @ApiTags('树洞模块')
 @ApiBearerAuth()
@@ -23,5 +24,10 @@ export class TreeholeController {
   @Get('detail')
   async getDetail(@Query() dto: TreeholeDetailDto) {
     return this.treeholeService.getDetail(dto)
+  }
+
+  @Post('create')
+  async createHole(@Body() dto: CreateHoleDto, @Req() req: IRequestHeaderUserData) {
+    return this.treeholeService.createHole(dto, req.user)
   }
 }

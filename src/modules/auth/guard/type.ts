@@ -4,7 +4,7 @@ export interface ITokenData {
   exp: number
 }
 
-export interface RequestHeaderUserInfo {
+export interface IRequestHeaderUserData {
   user: ITokenData
   [key: string]: any
 }

@@ -1,17 +1,16 @@
 import {
+  ArrayMaxSize,
+  IsArray,
   IsNotEmpty,
   IsString,
-  ValidationArguments,
-  ValidationOptions,
-  ValidatorConstraint,
-  ValidatorConstraintInterface,
-  registerDecorator,
+  ValidationArguments, ValidationOptions, ValidatorConstraint, ValidatorConstraintInterface, registerDecorator,
 } from 'class-validator'
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { ApiProperty } from '@nestjs/swagger'
-import { TreeholeMode } from '../../../schema/treeholeMode.schema'
+import { TreeholeMode } from '../../../schema/treehole/treeholeMode.schema'
+import { PaginationDto } from '../../../common/dto/pagination.schema'
 
 @ValidatorConstraint({ async: true })
 @Injectable()
@@ -41,7 +40,7 @@ function IsTreeholeMode(validationOptions?: ValidationOptions) {
   }
 }
 
-export class TreeholeListDto {
+export class TreeholeListDto extends PaginationDto {
   @ApiProperty({ type: String, description: '树洞mode' })
   @IsString()
   @IsNotEmpty()
@@ -54,5 +53,18 @@ export class TreeholeListDto {
 export class TreeholeDetailDto {
   @ApiProperty({ type: Number, description: '树洞id' })
   @IsNotEmpty()
+  @IsString()
     id: string
+}
+
+export class CreateHoleDto {
+  @ApiProperty({ type: String, description: '正文' })
+  @IsString()
+  @IsNotEmpty()
+    content: string
+
+  @ApiProperty({ type: Array, description: '图片' })
+  @IsArray()
+  @ArrayMaxSize(3, { message: '最多只能上传3张照片' })
+    imgs: string[]
 }
