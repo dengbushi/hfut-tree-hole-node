@@ -2,7 +2,7 @@ import { Body, Controller, Get, Inject, Post, Query, Req } from '@nestjs/common'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { Request } from 'express'
 import { TreeholeService } from './treehole.service'
-import { CreateCommentDto, CreateHoleDto, TreeholeDetailDto, TreeholeListDto } from './dto/treehole.dto'
+import { CreateCommentDto, CreateHoleDto, StarHoleDto, TreeholeDetailDto, TreeholeListDto } from './dto/treehole.dto'
 import { ModeService } from './mode.service'
 
 @ApiTags('树洞模块')
@@ -42,5 +42,10 @@ export class TreeholeController {
   @Post('comment')
   async createComment(@Body() dto: CreateCommentDto, @Req() req: Request) {
     return this.treeholeService.createComment(dto, req.user)
+  }
+
+  @Post('star')
+  async starHole(@Body() dto: StarHoleDto, @Req() req: Request) {
+    return this.treeholeService.starHole(dto, req.user)
   }
 }

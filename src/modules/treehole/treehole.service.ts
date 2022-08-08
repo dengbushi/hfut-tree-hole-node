@@ -1,12 +1,11 @@
-import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common'
+import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
-import * as _ from 'lodash'
 import { createResponse } from '../../shared/utils/create'
 import { Holes, HolesDocument } from '../../schema/treehole/holes.schema'
-import { TreeholeDaoService } from '../../dao/treehole-dao.service'
+import { TreeholeDaoService } from '../../dao/treehole/treehole-dao.service'
 import { IUser } from '../../env'
-import { CreateCommentDto, CreateHoleDto, TreeholeDetailDto, TreeholeListDto } from './dto/treehole.dto'
+import { CreateCommentDto, CreateHoleDto, StarHoleDto, TreeholeDetailDto, TreeholeListDto } from './dto/treehole.dto'
 
 @Injectable()
 export class TreeholeService {
@@ -23,19 +22,12 @@ export class TreeholeService {
   }
 
   async getDetail(dto: TreeholeDetailDto) {
-    let res: Holes
-
     try {
-      res = await this.holesModel.findById(dto.id, { 'comments.userId': 0 })
+      const res = await this.treeholeDaoService.getDetail(dto.id)
+      return createResponse('获取树洞详情成功', res)
     } catch (err) {
       throw new InternalServerErrorException('获取树洞详情失败')
     }
-
-    if (_.isEmpty(res)) {
-      throw new NotFoundException('没有找到这个树洞哦~')
-    }
-
-    return createResponse('获取树洞详情成功', res)
   }
 
   async createHole(dto: CreateHoleDto, user: IUser) {
@@ -56,5 +48,17 @@ export class TreeholeService {
     await this.treeholeDaoService.createComment(dto, user)
 
     return createResponse('留言成功', {})
+  }
+
+  async starHole(dto: StarHoleDto, user: IUser) {
+    try {
+      await this.holesModel.updateOne({ _id: dto.id }, {
+        $inc: { stars: 1 },
+      })
+
+      return createResponse('点赞树洞成功')
+    } catch (err) {
+      throw new InternalServerErrorException('树洞点赞失败')
+    }
   }
 }

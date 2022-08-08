@@ -1,9 +1,11 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model, PipelineStage } from 'mongoose'
-import { Holes, HolesDocument } from '../schema/treehole/holes.schema'
-import { CreateCommentDto, TreeholeListDto } from '../modules/treehole/dto/treehole.dto'
-import { IUser } from '../env'
+import Mongoose, { Model, PipelineStage } from 'mongoose'
+import { Holes, HolesDocument } from '../../schema/treehole/holes.schema'
+import { CreateCommentDto, TreeholeListDto } from '../../modules/treehole/dto/treehole.dto'
+import { IUser } from '../../env'
+import { unset } from '../../shared/utils/object'
+import { ITreeholeDetailPipeLineStage } from './types'
 
 @Injectable()
 export class TreeholeDaoService {
@@ -50,6 +52,7 @@ export class TreeholeDaoService {
             password: 0,
             holeIds: 0,
             __v: 0,
+            role: 0,
           },
           '__v': 0,
           'updatedTime': 0,
@@ -87,6 +90,64 @@ export class TreeholeDaoService {
     }
   }
 
+  async getDetail(id: string) {
+    const pipeLineStage: PipelineStage[] = [{
+      $match: {
+        _id: new Mongoose.Types.ObjectId(id),
+      },
+    }, {
+      $lookup: {
+        from: 'users',
+        localField: 'userId',
+        foreignField: 'studentId',
+        as: 'user',
+      },
+    }, {
+      $unwind: '$user',
+    }, {
+      $lookup: {
+        from: 'users',
+        localField: 'comments.userId',
+        foreignField: 'studentId',
+        as: 'comments_user',
+      },
+    }, {
+      $project: {
+        userId: 0,
+        user: {
+          _id: 0,
+          studentId: 0,
+          password: 0,
+          holeIds: 0,
+          __v: 0,
+        },
+        __v: 0,
+        updatedTime: 0,
+      },
+    }]
+
+    const res = (await this.holesModel.aggregate(pipeLineStage))[0] as ITreeholeDetailPipeLineStage
+
+    res.comments = res.comments.map((item) => {
+      const user = res.comments_user.filter(commentItem => commentItem.studentId === item.userId)[0]
+
+      unset(item, 'userId')
+
+      item = {
+        ...item,
+        user: {
+          username: user.username,
+        },
+      }
+
+      return item
+    })
+
+    unset(res, 'comments_user')
+
+    return res
+  }
+
   async createComment(dto: CreateCommentDto, user: IUser) {
     try {
       await this.holesModel.updateOne({ _id: dto.id }, {
@@ -101,5 +162,9 @@ export class TreeholeDaoService {
     } catch (err) {
       throw new InternalServerErrorException('留言失败')
     }
+  }
+
+  async findById(id: string) {
+    return this.holesModel.findById(id)
   }
 }

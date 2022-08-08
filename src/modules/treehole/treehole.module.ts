@@ -2,11 +2,11 @@ import { Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
 import { TreeholeMode, TreeholeModeSchema } from '../../schema/treehole/treeholeMode.schema'
 import { Holes, HolesSchema } from '../../schema/treehole/holes.schema'
-import { TreeholeDaoService } from '../../dao/treehole-dao.service'
+import { TreeholeDaoService } from '../../dao/treehole/treehole-dao.service'
 import { TreeholeController } from './treehole.controller'
 import { TreeholeService } from './treehole.service'
-import { IsModeExist } from './dto/treehole.dto'
 import { ModeService } from './mode.service'
+import { IsModeExist, ValidateId } from './dto/utils'
 
 @Module({
   imports: [
@@ -16,6 +16,12 @@ import { ModeService } from './mode.service'
     ]),
   ],
   controllers: [TreeholeController],
-  providers: [TreeholeService, IsModeExist, TreeholeDaoService, ModeService],
+  providers: [
+    TreeholeService,
+    IsModeExist,
+    ValidateId,
+    TreeholeDaoService,
+    ModeService,
+  ],
 })
 export class TreeholeModule {}
