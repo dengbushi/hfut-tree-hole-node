@@ -4,47 +4,11 @@ import {
   IsNotEmpty,
   IsString,
   MaxLength,
-  ValidationArguments,
-  ValidationOptions,
-  ValidatorConstraint,
-  ValidatorConstraintInterface,
-  registerDecorator,
 } from 'class-validator'
-import { Injectable } from '@nestjs/common'
-import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
 import { ApiProperty } from '@nestjs/swagger'
-import { TreeholeMode } from '../../../schema/treehole/treeholeMode.schema'
 import { PaginationDto } from '../../../common/dto/pagination.schema'
 import { TreeholeConst } from '../../../shared/constant/treehole'
-
-@ValidatorConstraint({ async: true })
-@Injectable()
-export class IsModeExist implements ValidatorConstraintInterface {
-  constructor(
-    @InjectModel(TreeholeMode.name)
-    private readonly treeholeModeModel: Model<TreeholeMode>,
-  ) {
-  }
-
-  async validate(mode: any, args: ValidationArguments) {
-    const res = (await this.treeholeModeModel.findOne()).modes
-
-    return !!res.map(item => item.value).includes(mode)
-  }
-}
-
-function IsTreeholeMode(validationOptions?: ValidationOptions) {
-  return function(object: Object, propertyName: string) {
-    registerDecorator({
-      target: object.constructor,
-      propertyName,
-      options: validationOptions,
-      constraints: [],
-      validator: IsModeExist,
-    })
-  }
-}
+import { IsTreeholeMode, IsValidIdDto } from './utils'
 
 export class TreeholeListDto extends PaginationDto {
   @ApiProperty({ type: String, description: '树洞mode' })
@@ -56,12 +20,7 @@ export class TreeholeListDto extends PaginationDto {
     mode: string
 }
 
-export class TreeholeDetailDto {
-  @ApiProperty({ type: Number, description: '树洞id' })
-  @IsNotEmpty()
-  @IsString()
-    id: string
-}
+export class TreeholeDetailDto extends IsValidIdDto {}
 
 export class CreateHoleDto {
   @ApiProperty({ type: String, description: '正文' })
@@ -78,12 +37,7 @@ export class CreateHoleDto {
     imgs: string[]
 }
 
-export class CreateCommentDto {
-  @ApiProperty({ type: String, description: '树洞id' })
-  @IsString()
-  @IsNotEmpty()
-    id: string
-
+export class CreateCommentDto extends IsValidIdDto {
   @ApiProperty({ type: String, description: '正文' })
   @IsString()
   @IsNotEmpty()
@@ -92,3 +46,5 @@ export class CreateCommentDto {
   })
     content: string
 }
+
+export class StarHoleDto extends IsValidIdDto {}
