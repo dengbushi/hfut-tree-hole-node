@@ -1,20 +1,18 @@
-import { Prop, SchemaFactory } from '@nestjs/mongoose'
-import mongoose, { Document } from 'mongoose'
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import { Document } from 'mongoose'
 import { BaseSchema } from '../../common/decorators/BaseSchema.decorator'
 
 export type HolesDocument = Holes & Document
 
+@Schema()
 export class Comment {
   @Prop({ type: Number, index: 1 })
     userId: number
 
-  @Prop({ type: String, index: 1 })
+  @Prop(String)
     content: string
 
-  @Prop({ type: Array })
-    reply: any[]
-
-  @Prop({ type: Date, required: true })
+  @Prop(Date)
     createTime: Date
 }
 
@@ -32,7 +30,7 @@ export class Holes {
   @Prop({ type: [String] })
     imgs: string[]
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }] })
+  @Prop({ type: [{ type: Object }] })
     comments: Comment[]
 }
 

@@ -1,12 +1,12 @@
 import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
-import { isEmpty } from 'lodash'
+import * as _ from 'lodash'
 import { createResponse } from '../../shared/utils/create'
 import { Holes, HolesDocument } from '../../schema/treehole/holes.schema'
-import { ITokenData } from '../auth/guard/type'
 import { TreeholeDaoService } from '../../dao/treehole-dao.service'
-import { CreateHoleDto, TreeholeDetailDto, TreeholeListDto } from './dto/treehole.dto'
+import { IUser } from '../../env'
+import { CreateCommentDto, CreateHoleDto, TreeholeDetailDto, TreeholeListDto } from './dto/treehole.dto'
 
 @Injectable()
 export class TreeholeService {
@@ -16,16 +16,6 @@ export class TreeholeService {
   @Inject()
   private readonly treeholeDaoService: TreeholeDaoService
 
-  async getModes() {
-    const modes = await this.holesModel.findOne({}, { _id: 0, __v: 0 })
-
-    if (isEmpty(modes)) {
-      throw new NotFoundException('未查询到树洞浏览模式')
-    }
-
-    return createResponse('获取树洞模式成功', modes)
-  }
-
   async getList(dto: TreeholeListDto) {
     const holes = await this.treeholeDaoService.getList(dto)
 
@@ -33,29 +23,22 @@ export class TreeholeService {
   }
 
   async getDetail(dto: TreeholeDetailDto) {
-    return createResponse('',
-      {
-        content: 'Hello World!',
-        id: '1',
-        createTime: '22/07/01',
-        commentsNum: 464,
-        stars: 361,
-        comments: [
-          { avatar: '', isHost: true, content: 'Hello World!', createTime: '22/07/01 18:06:53', username: 'Alice', reply: [] },
-          {
-            avatar: '',
-            isHost: false,
-            content: '打卡',
-            createTime: '22/07/01 18:09:54',
-            username: 'Bob',
-            reply: [],
-          },
-        ],
-        imgs: [],
-      })
+    let res: Holes
+
+    try {
+      res = await this.holesModel.findById(dto.id, { 'comments.userId': 0 })
+    } catch (err) {
+      throw new InternalServerErrorException('获取树洞详情失败')
+    }
+
+    if (_.isEmpty(res)) {
+      throw new NotFoundException('没有找到这个树洞哦~')
+    }
+
+    return createResponse('获取树洞详情成功', res)
   }
 
-  async createHole(dto: CreateHoleDto, user: ITokenData) {
+  async createHole(dto: CreateHoleDto, user: IUser) {
     try {
       const hole = await new this.holesModel({
         userId: user.studentId,
@@ -67,5 +50,11 @@ export class TreeholeService {
     } catch (err) {
       throw new InternalServerErrorException('创建树洞失败')
     }
+  }
+
+  async createComment(dto: CreateCommentDto, user: IUser) {
+    await this.treeholeDaoService.createComment(dto, user)
+
+    return createResponse('留言成功', {})
   }
 }

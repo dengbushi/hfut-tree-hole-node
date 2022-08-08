@@ -1,5 +1,5 @@
-import { Controller, Get, Inject, Request } from '@nestjs/common'
-import { IRequestHeaderUserData } from '../auth/guard/type'
+import { Controller, Get, Inject, Req } from '@nestjs/common'
+import { Request } from 'express'
 import { UserService } from './user.service'
 
 @Controller('user')
@@ -8,7 +8,7 @@ export class UserController {
   private readonly userService: UserService
 
   @Get('getUserInfo')
-  getUserInfo(@Request() req: IRequestHeaderUserData) {
+  getUserInfo(@Req() req: Request) {
     return this.userService.getUserInfo(req.user)
   }
 }

@@ -5,16 +5,16 @@ import { LoginDataDto } from '../auth/dto/loginData.dto'
 import { isNumber } from '../../shared/utils/is'
 import { RegisterDataDto } from '../auth/dto/registerData.dto'
 import { Users, UsersDocument } from '../../schema/user/user.schema'
-import { ITokenData } from '../auth/guard/type'
 import { createResponse } from '../../shared/utils/create'
 import { set } from '../../shared/utils/object'
+import { IUser } from '../../env'
 
 @Injectable()
 export class UserService {
   @InjectModel(Users.name)
   private readonly usersModel: Model<UsersDocument>
 
-  async getUserInfo(payload: ITokenData) {
+  async getUserInfo(payload: IUser) {
     const user = await this.findOne(payload.studentId, 'password')
 
     if (!user) {
