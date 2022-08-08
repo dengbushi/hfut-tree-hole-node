@@ -22,13 +22,13 @@ export class TreeholeController {
   }
 
   @Get('list')
-  async getList(@Query() dto: TreeholeListDto) {
-    return this.treeholeService.getList(dto)
+  async getList(@Query() dto: TreeholeListDto, @Req() req: Request) {
+    return this.treeholeService.getList(dto, req.user)
   }
 
   @Get('detail')
-  async getDetail(@Query() dto: TreeholeDetailDto) {
-    return this.treeholeService.getDetail(dto)
+  async getDetail(@Query() dto: TreeholeDetailDto, @Req() req: Request) {
+    return this.treeholeService.getDetail(dto, req.user)
   }
 
   @Post('create')
@@ -47,5 +47,10 @@ export class TreeholeController {
   @Post('star')
   async starHole(@Body() dto: StarHoleDto, @Req() req: Request) {
     return this.treeholeService.starHole(dto, req.user)
+  }
+
+  @Post('removeStar')
+  async removeStar(@Body() dto: StarHoleDto, @Req() req: Request) {
+    return this.treeholeService.removeStar(dto, req.user)
   }
 }

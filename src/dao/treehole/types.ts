@@ -7,6 +7,8 @@ export interface ITreeholeDetailPipeLineStage {
   createTime: string
   user: User
   comments_user: CommentsUser[]
+  starUserIds: number[]
+  isStar: boolean
 }
 
 interface Comment {

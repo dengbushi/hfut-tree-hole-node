@@ -6,13 +6,14 @@ import { CreateCommentDto, TreeholeListDto } from '../../modules/treehole/dto/tr
 import { IUser } from '../../env'
 import { unset } from '../../shared/utils/object'
 import { ITreeholeDetailPipeLineStage } from './types'
+import { isStarHole } from './utils'
 
 @Injectable()
 export class TreeholeDaoService {
   @InjectModel(Holes.name)
   private readonly holesModel: Model<HolesDocument>
 
-  async getList(dto: TreeholeListDto) {
+  async getList(dto: TreeholeListDto, userId: number) {
     const sort: PipelineStage = {
       $sort: { stars: -1, createTime: -1 },
     }
@@ -84,13 +85,18 @@ export class TreeholeDaoService {
     }
 
     try {
-      return this.holesModel.aggregate(pipeLineStage)
+      const queryRes = await this.holesModel.aggregate(pipeLineStage) as ITreeholeDetailPipeLineStage[]
+      return queryRes.map((item) => {
+        item.isStar = isStarHole(item.starUserIds, userId)
+        unset(item, 'starUserIds')
+        return item
+      })
     } catch (err) {
       throw new InternalServerErrorException('获取树洞列表失败')
     }
   }
 
-  async getDetail(id: string) {
+  async getDetail(id: string, userId: number) {
     const pipeLineStage: PipelineStage[] = [{
       $match: {
         _id: new Mongoose.Types.ObjectId(id),
@@ -144,6 +150,9 @@ export class TreeholeDaoService {
     })
 
     unset(res, 'comments_user')
+
+    res.isStar = isStarHole(res.starUserIds, userId)
+    unset(res, 'starUserIds')
 
     return res
   }

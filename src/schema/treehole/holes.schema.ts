@@ -27,6 +27,9 @@ export class Holes {
   @Prop({ type: Number, index: 1, default: 0 })
     stars: number
 
+  @Prop({ type: [Number], default: [] })
+    starUserIds: number[]
+
   @Prop({ type: [String] })
     imgs: string[]
 
