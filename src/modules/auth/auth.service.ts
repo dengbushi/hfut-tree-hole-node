@@ -6,8 +6,10 @@ import { ConfigService } from '@nestjs/config'
 import { AxiosError } from 'axios'
 import { UserService } from '../user/user.service'
 import { createResponse } from '../../shared/utils/create'
-import { Roles, Users, UsersDocument } from '../../schema/user/user.schema'
+import { Users, UsersDocument } from '../../schema/user/user.schema'
 import { loginVerifyRequest } from '../../request/loginVerify'
+import { Role } from '../role/role.enum'
+import { isArray } from '../../shared/utils/is'
 import { LoginDataDto } from './dto/loginData.dto'
 import { RegisterDataDto } from './dto/registerData.dto'
 import { ForgetDataDto } from './dto/forgetData.dto'
@@ -32,7 +34,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('密码错误')
     } else {
-      return createResponse('登录成功', { token: this.signToken(user.studentId) })
+      return createResponse('登录成功', { token: this.signToken(user.studentId, Role.User) })
     }
   }
 
@@ -51,13 +53,14 @@ export class AuthService {
 
     await this.verifyHfutAccount(dto)
 
+    const roles = [Role.User]
     const user = await new this.userModel({
       ...dto,
-      role: Roles.steve,
+      roles,
     }).save()
 
     if (user) {
-      return createResponse('注册成功', { token: this.signToken(user.studentId) })
+      return createResponse('注册成功', { token: this.signToken(user.studentId, roles) })
     }
   }
 
@@ -72,14 +75,18 @@ export class AuthService {
     const updatedUser = await this.userModel.updateOne({ studentId: forgetDataDto.studentId }, { password: forgetDataDto.password })
 
     if (updatedUser) {
-      return createResponse('修改密码成功', { token: this.signToken(forgetDataDto.studentId), updatedUser })
+      return createResponse('修改密码成功', { token: this.signToken(forgetDataDto.studentId, Role.User), updatedUser })
     } else {
       throw new NotAcceptableException('修改密码失败')
     }
   }
 
-  signToken(studentId: number) {
-    return this.jwtService.sign({ studentId })
+  signToken(studentId: number, roles: Role | Role[]) {
+    if (!isArray(roles)) {
+      roles = [roles]
+    }
+
+    return this.jwtService.sign({ studentId, roles })
   }
 
   async verifyHfutAccount(dto: RegisterDataDto | ForgetDataDto) {

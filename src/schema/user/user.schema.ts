@@ -1,17 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import Mongoose, { Document } from 'mongoose'
+import { Role } from '../../modules/role/role.enum'
 
-export type UsersDocument =Users & Document
-
-export enum Roles {
-  notch = 'notch',
-
-  steve = 'steve',
-
-  // 被关进小黑屋的角色
-  banned = 'banned',
-  muted = 'muted',
-}
+export type UsersDocument = Users & Document
 
 @Schema()
 export class Users {
@@ -30,8 +21,8 @@ export class Users {
   @Prop({ type: [{ type: Mongoose.SchemaTypes.Number }] })
     holeIds: number[]
 
-  @Prop(String)
-    role: Roles
+  @Prop({ type: [{ type: Object }] })
+    roles: Role[]
 }
 
 export const UsersSchema = SchemaFactory.createForClass(Users)

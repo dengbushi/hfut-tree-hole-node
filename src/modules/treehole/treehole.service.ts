@@ -1,11 +1,20 @@
-import { BadRequestException, Inject, Injectable, InternalServerErrorException } from '@nestjs/common'
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import Mongoose, { Model } from 'mongoose'
 import { createResponse } from '../../shared/utils/create'
 import { Holes, HolesDocument } from '../../schema/treehole/holes.schema'
 import { TreeholeDaoService } from '../../dao/treehole/treehole-dao.service'
 import { IUser } from '../../env'
+import { Action } from '../../common/enums/action.enum'
 import { CreateCommentDto, CreateHoleDto, StarHoleDto, TreeholeDetailDto, TreeholeListDto } from './dto/treehole.dto'
+import { IsValidIdDto } from './dto/utils'
+import { CaslAbilityFactory } from './casl.factory'
 
 @Injectable()
 export class TreeholeService {
@@ -14,6 +23,9 @@ export class TreeholeService {
 
   @Inject()
   private readonly treeholeDaoService: TreeholeDaoService
+
+  @Inject()
+  private readonly caslFactory: CaslAbilityFactory
 
   async getList(dto: TreeholeListDto, user: IUser) {
     const holes = await this.treeholeDaoService.getList(dto, user.studentId)
@@ -42,6 +54,23 @@ export class TreeholeService {
       return createResponse('创建树洞成功', { _id: hole._id })
     } catch (err) {
       throw new InternalServerErrorException('创建树洞失败')
+    }
+  }
+
+  async removeHole(dto: IsValidIdDto, user: IUser) {
+    const hole = await this.findHole(dto.id)
+    const ability = await this.caslFactory.createForUser(user)
+
+    if (!ability.can(Action.Delete, hole)) {
+      throw new UnauthorizedException('权限不足')
+    }
+
+    try {
+      await this.holesModel.remove({ _id: new Mongoose.Types.ObjectId(dto.id) })
+
+      return createResponse('删除成功')
+    } catch (err) {
+      throw new InternalServerErrorException('删除树洞失败')
     }
   }
 
@@ -90,5 +119,14 @@ export class TreeholeService {
     } catch (err) {
       throw new InternalServerErrorException('树洞点赞删除失败')
     }
+  }
+
+  async findHole(id: string) {
+    const article = await this.treeholeDaoService.findById(id)
+    const hole = new Holes({
+      userId: article.userId,
+    })
+
+    return hole
   }
 }

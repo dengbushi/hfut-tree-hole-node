@@ -9,6 +9,7 @@ import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
 import { LocalStrategy } from './guard/local.strategy'
 import { JwtStrategy } from './guard/jwt.strategy'
+import { ValidateStudentExistId } from './dto/studentId.dto'
 
 @Module({
   imports: [
@@ -28,6 +29,6 @@ import { JwtStrategy } from './guard/jwt.strategy'
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy, ConfigService],
+  providers: [AuthService, LocalStrategy, JwtStrategy, ConfigService, ValidateStudentExistId],
 })
 export class AuthModule {}

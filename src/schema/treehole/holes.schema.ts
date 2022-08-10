@@ -35,6 +35,10 @@ export class Holes {
 
   @Prop({ type: [{ type: Object }] })
     comments: Comment[]
+
+  constructor(props: { userId: number }) {
+    Object.assign(this, props)
+  }
 }
 
 export const HolesSchema = SchemaFactory.createForClass(Holes)

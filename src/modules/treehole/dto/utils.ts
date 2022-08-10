@@ -53,6 +53,7 @@ export class ValidateId implements ValidatorConstraintInterface {
     }
 
     const isHoleExist = await this.treeholeDaoService.findById(id)
+
     if (!isHoleExist) {
       throw new NotFoundException('没有找到这个树洞哦~')
     }

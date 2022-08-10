@@ -1,13 +1,17 @@
 import { Body, Controller, Get, Inject, Post, Query, Req } from '@nestjs/common'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { Request } from 'express'
+import { Roles } from '../../common/decorators/roles.decorator'
+import { Role } from '../role/role.enum'
 import { TreeholeService } from './treehole.service'
 import { CreateCommentDto, CreateHoleDto, StarHoleDto, TreeholeDetailDto, TreeholeListDto } from './dto/treehole.dto'
 import { ModeService } from './mode.service'
+import { IsValidIdDto } from './dto/utils'
 
 @ApiTags('树洞模块')
 @ApiBearerAuth()
 @Controller('treehole')
+@Roles([Role.Admin, Role.User])
 export class TreeholeController {
   @Inject()
   private readonly treeholeService: TreeholeService
@@ -37,6 +41,14 @@ export class TreeholeController {
     @Req() req: Request,
   ) {
     return this.treeholeService.createHole(dto, req.user)
+  }
+
+  @Post('remove')
+  async removeHole(
+    @Body() dto: IsValidIdDto,
+    @Req() req: Request,
+  ) {
+    return this.treeholeService.removeHole(dto, req.user)
   }
 
   @Post('comment')

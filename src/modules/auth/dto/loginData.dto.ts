@@ -1,21 +1,8 @@
-import { IsNotEmpty, IsNumber, IsString, Length } from 'class-validator'
+import { IsNotEmpty, IsString, Length } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
-import { NumberLength } from '../../../common/decorators/NumberLength.decorator'
+import { StudentIdDataDto } from './studentId.dto'
 
-export class LoginDataDto {
-  @ApiProperty({
-    description: '学号',
-  })
-  @IsNumber({
-    allowNaN: false,
-  }, {
-    message: '学号格式错误',
-  })
-  @NumberLength(10, 10, {
-    message: '学号只能为10位长度',
-  })
-    studentId: number
-
+export class LoginDataDto extends StudentIdDataDto {
   @ApiProperty({
     description: '树洞密码',
   })
