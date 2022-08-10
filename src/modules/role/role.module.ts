@@ -4,7 +4,7 @@ import { Users, UsersSchema } from '../../schema/user/user.schema'
 import { UserService } from '../user/user.service'
 import { RoleService } from './role.service'
 import { RolesGuard } from './guard/role.guard'
-import { RoleController } from './role.controller';
+import { RoleController } from './role.controller'
 
 @Module({
   imports: [MongooseModule.forFeature([
