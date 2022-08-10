@@ -21,7 +21,6 @@ export class TreeholeController {
 
   @Get('modes')
   async getModes() {
-    console.log(1)
     return this.modeService.getModes()
   }
 
