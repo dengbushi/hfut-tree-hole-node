@@ -30,7 +30,9 @@ export class CaslAbilityFactory {
     can(Action.Update, Holes, { userId: user.studentId })
     can(Action.Delete, Holes, { userId: user.studentId })
 
-    if (await this.roleService.isBanned(user.studentId)) {
+    const isBanned = await this.roleService.isBanned(user.studentId)
+
+    if (isBanned) {
       cannot(Action.Create, Holes)
       cannot(Action.Update, Holes)
       cannot(Action.Delete, Holes)

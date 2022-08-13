@@ -7,11 +7,11 @@ import { RoleModule } from '../role/role.module'
 import { RoleService } from '../role/role.service'
 import { Users, UsersSchema } from '../../schema/user/user.schema'
 import { UserService } from '../user/user.service'
+import { CaslAbilityFactory } from '../casl/casl.factory'
 import { TreeholeController } from './treehole.controller'
 import { TreeholeService } from './treehole.service'
 import { ModeService } from './mode.service'
 import { IsModeExist, ValidateId } from './dto/utils'
-import { CaslAbilityFactory } from './casl.factory'
 
 @Module({
   imports: [

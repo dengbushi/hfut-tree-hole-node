@@ -7,6 +7,7 @@ import { CommonModule } from './common/common.module'
 import { TreeholeModule } from './modules/treehole/treehole.module'
 import { DaoModule } from './dao/dao.module'
 import { RoleModule } from './modules/role/role.module'
+import { CaslModule } from './modules/casl/casl.module'
 import databaseConfig from './config/database.config'
 
 @Module({
@@ -28,6 +29,7 @@ import databaseConfig from './config/database.config'
     TreeholeModule,
     DaoModule,
     RoleModule,
+    CaslModule,
   ],
   controllers: [],
   providers: [],

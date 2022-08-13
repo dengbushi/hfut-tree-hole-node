@@ -3,7 +3,6 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
-  UnauthorizedException,
 } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import Mongoose, { Model } from 'mongoose'
@@ -11,10 +10,8 @@ import { createResponse } from '../../shared/utils/create'
 import { Holes, HolesDocument } from '../../schema/treehole/holes.schema'
 import { TreeholeDaoService } from '../../dao/treehole/treehole-dao.service'
 import { IUser } from '../../env'
-import { Action } from '../../common/enums/action.enum'
 import { CreateCommentDto, CreateHoleDto, StarHoleDto, TreeholeDetailDto, TreeholeListDto } from './dto/treehole.dto'
 import { IsValidIdDto } from './dto/utils'
-import { CaslAbilityFactory } from './casl.factory'
 
 @Injectable()
 export class TreeholeService {
@@ -23,9 +20,6 @@ export class TreeholeService {
 
   @Inject()
   private readonly treeholeDaoService: TreeholeDaoService
-
-  @Inject()
-  private readonly caslFactory: CaslAbilityFactory
 
   async getList(dto: TreeholeListDto, user: IUser) {
     const holes = await this.treeholeDaoService.getList(dto, user.studentId)
@@ -58,15 +52,8 @@ export class TreeholeService {
   }
 
   async removeHole(dto: IsValidIdDto, user: IUser) {
-    const hole = await this.findHole(dto.id)
-    const ability = await this.caslFactory.createForUser(user)
-
-    if (!ability.can(Action.Delete, hole)) {
-      throw new UnauthorizedException('权限不足')
-    }
-
     try {
-      await this.holesModel.remove({ _id: new Mongoose.Types.ObjectId(dto.id) })
+      await this.holesModel.deleteOne({ _id: new Mongoose.Types.ObjectId(dto.id) })
 
       return createResponse('删除成功')
     } catch (err) {

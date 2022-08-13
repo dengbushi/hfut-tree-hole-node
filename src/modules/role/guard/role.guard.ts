@@ -37,6 +37,10 @@ export class RolesGuard implements CanActivate {
 
     const user = await this.usersModel.findOne({ studentId: reqUser.studentId })
 
+    if (requiredRoles.includes(Role.Admin)) {
+      return true
+    }
+
     if (!requiredRoles.includes(Role.Banned) && user.roles.includes(Role.Banned)) {
       throw new UnauthorizedException('你已被关进小黑屋')
     }
