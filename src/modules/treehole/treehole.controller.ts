@@ -7,7 +7,6 @@ import { Police } from '../../common/guards/policies.guard'
 import { CheckPolicies } from '../../common/decorators/CheckPolicies.decorator'
 import { CreateHolePolicyHandler } from '../../common/policies/create.police'
 import { DeleteHolePolicyHandler } from '../../common/policies/delete.police'
-import { UpdateHolePolicyHandler } from '../../common/policies/update.police'
 import { TreeholeService } from './treehole.service'
 import { CreateCommentDto, CreateHoleDto, StarHoleDto, TreeholeDetailDto, TreeholeListDto } from './dto/treehole.dto'
 import { ModeService } from './mode.service'
@@ -63,7 +62,6 @@ export class TreeholeController {
     return this.treeholeService.createComment(dto, req.user)
   }
 
-  @CheckPolicies(UpdateHolePolicyHandler)
   @Post('star')
   async starHole(@Body() dto: StarHoleDto, @Req() req: Request) {
     return this.treeholeService.starHole(dto, req.user)
