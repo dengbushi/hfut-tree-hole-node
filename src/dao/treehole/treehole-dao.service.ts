@@ -2,8 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import Mongoose, { Model, PipelineStage } from 'mongoose'
 import { Holes, HolesDocument } from '../../schema/treehole/holes.schema'
-import { CreateCommentDto, TreeholeListDto } from '../../modules/treehole/dto/treehole.dto'
-import { IUser } from '../../env'
+import { TreeholeListDto } from '../../modules/treehole/dto/treehole.dto'
 import { unset } from '../../shared/utils/object'
 import { ITreeholeDetailPipeLineStage } from './types'
 import { isStarHole } from './utils'
@@ -155,22 +154,6 @@ export class TreeholeDaoService {
     unset(res, 'starUserIds')
 
     return res
-  }
-
-  async createComment(dto: CreateCommentDto, user: IUser) {
-    try {
-      await this.holesModel.updateOne({ _id: dto.id }, {
-        $push: {
-          comments: {
-            userId: user.studentId,
-            content: dto.content,
-            createTime: new Date(),
-          },
-        },
-      })
-    } catch (err) {
-      throw new InternalServerErrorException('留言失败')
-    }
   }
 
   async findById(id: string) {

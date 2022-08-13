@@ -11,6 +11,8 @@ import { TreeholeDaoService } from './treehole/treehole-dao.service'
       { name: Holes.name, schema: HolesSchema },
     ]),
   ],
-  providers: [TreeholeDaoService],
+  providers: [
+    TreeholeDaoService,
+  ],
 })
 export class DaoModule {}

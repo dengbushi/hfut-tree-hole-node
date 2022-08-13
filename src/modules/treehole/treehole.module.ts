@@ -11,7 +11,10 @@ import { CaslAbilityFactory } from '../casl/casl.factory'
 import { TreeholeController } from './treehole.controller'
 import { TreeholeService } from './treehole.service'
 import { ModeService } from './mode.service'
-import { IsModeExist, ValidateId } from './dto/utils'
+import { IsModeExist, ValidateHoleId, ValidateId } from './dto/utils'
+import { CreateHolePolicyHandler } from './policies/create.police'
+import { DeleteHolePolicyHandler } from './policies/delete.police'
+import { UpdateHolePolicyHandler } from './policies/update.police'
 
 @Module({
   imports: [
@@ -27,11 +30,15 @@ import { IsModeExist, ValidateId } from './dto/utils'
     TreeholeService,
     IsModeExist,
     ValidateId,
+    ValidateHoleId,
     TreeholeDaoService,
     ModeService,
     CaslAbilityFactory,
     RoleService,
     UserService,
+    CreateHolePolicyHandler,
+    DeleteHolePolicyHandler,
+    UpdateHolePolicyHandler,
   ],
 })
 export class TreeholeModule {}

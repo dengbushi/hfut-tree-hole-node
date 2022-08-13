@@ -1,11 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { Document } from 'mongoose'
+import mongoose, { Document } from 'mongoose'
 import { BaseSchema } from '../../common/decorators/BaseSchema.decorator'
 
 export type HolesDocument = Holes & Document
 
 @Schema()
 export class Comment {
+  @Prop(mongoose.Types.ObjectId)
+    _id: mongoose.Types.ObjectId
+
   @Prop({ type: Number, index: 1 })
     userId: number
 

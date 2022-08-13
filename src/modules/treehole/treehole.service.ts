@@ -1,17 +1,22 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common'
+import { BadRequestException, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import Mongoose, { Model } from 'mongoose'
+import mongoose, { Model } from 'mongoose'
 import { createResponse } from '../../shared/utils/create'
 import { Holes, HolesDocument } from '../../schema/treehole/holes.schema'
 import { TreeholeDaoService } from '../../dao/treehole/treehole-dao.service'
 import { IUser } from '../../env'
-import { CreateCommentDto, CreateHoleDto, StarHoleDto, TreeholeDetailDto, TreeholeListDto } from './dto/treehole.dto'
-import { IsValidIdDto } from './dto/utils'
+import { CaslAbilityFactory } from '../casl/casl.factory'
+import { Action } from '../../common/enums/action.enum'
+import { Role } from '../role/role.enum'
+import {
+  CreateCommentDto,
+  CreateHoleDto,
+  RemoveHoleCommentDto,
+  StarHoleDto,
+  TreeholeDetailDto,
+  TreeholeListDto,
+} from './dto/treehole.dto'
+import { IsValidHoleIdDto } from './dto/utils'
 
 @Injectable()
 export class TreeholeService {
@@ -20,6 +25,9 @@ export class TreeholeService {
 
   @Inject()
   private readonly treeholeDaoService: TreeholeDaoService
+
+  @Inject()
+  private readonly caslFacotry: CaslAbilityFactory
 
   async getList(dto: TreeholeListDto, user: IUser) {
     const holes = await this.treeholeDaoService.getList(dto, user.studentId)
@@ -51,9 +59,17 @@ export class TreeholeService {
     }
   }
 
-  async removeHole(dto: IsValidIdDto, user: IUser) {
+  async removeHole(dto: IsValidHoleIdDto, user: IUser) {
+    const hole = await this.treeholeDaoService.findById(dto.id)
+
+    const ability = await this.caslFacotry.createForUser(user)
+
+    if (!ability.can(Action.Delete, new Holes(hole))) {
+      throw new BadRequestException('你不能删除别人的树洞哦~')
+    }
+
     try {
-      await this.holesModel.deleteOne({ _id: new Mongoose.Types.ObjectId(dto.id) })
+      await this.holesModel.deleteOne({ _id: new mongoose.Types.ObjectId(dto.id) })
 
       return createResponse('删除成功')
     } catch (err) {
@@ -62,9 +78,55 @@ export class TreeholeService {
   }
 
   async createComment(dto: CreateCommentDto, user: IUser) {
-    await this.treeholeDaoService.createComment(dto, user)
+    try {
+      const id = new mongoose.Types.ObjectId()
+      await this.holesModel.updateOne({ _id: dto.id }, {
+        $push: {
+          comments: {
+            _id: id,
+            userId: user.studentId,
+            content: dto.content,
+            createTime: new Date(),
+          },
+        },
+      })
 
-    return createResponse('留言成功', {})
+      return createResponse('留言成功', { commentId: id })
+    } catch (err) {
+      throw new InternalServerErrorException('留言失败')
+    }
+  }
+
+  async removeComment(dto: RemoveHoleCommentDto, user: IUser) {
+    const commentId = new mongoose.Types.ObjectId(dto.commentId)
+
+    const isCommentExist = await this.holesModel.findOne({
+      comments: {
+        $elemMatch: { _id: commentId },
+      },
+    })
+
+    if (!isCommentExist) {
+      throw new NotFoundException('评论不存在')
+    }
+
+    const comment = isCommentExist.comments.find(item => commentId.equals(item._id))
+
+    if (comment.userId !== user.studentId && !user.roles.includes(Role.Admin)) {
+      throw new BadRequestException('不能删除其他人的评论')
+    }
+
+    try {
+      await this.holesModel.updateOne({ _id: dto.id }, {
+        $pull: {
+          comments: { _id: commentId },
+        },
+      })
+
+      return createResponse('删除评论成功')
+    } catch (err) {
+      throw new InternalServerErrorException('删除评论失败')
+    }
   }
 
   async starHole(dto: StarHoleDto, user: IUser) {
@@ -96,7 +158,7 @@ export class TreeholeService {
     }
 
     try {
-      await this.holesModel.updateOne({ _id: new Mongoose.Types.ObjectId(dto.id) }, {
+      await this.holesModel.updateOne({ _id: new mongoose.Types.ObjectId(dto.id) }, {
         $pull: {
           starUserIds: user.studentId as any,
         },
@@ -104,16 +166,14 @@ export class TreeholeService {
 
       return createResponse('删除成功')
     } catch (err) {
-      throw new InternalServerErrorException('树洞点赞删除失败')
+      throw new InternalServerErrorException('star删除失败')
     }
   }
 
   async findHole(id: string) {
     const article = await this.treeholeDaoService.findById(id)
-    const hole = new Holes({
+    return new Holes({
       userId: article.userId,
     })
-
-    return hole
   }
 }

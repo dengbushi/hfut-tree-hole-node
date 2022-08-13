@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { AppAbility } from '../../modules/casl/casl.factory'
-import { IPolicyHandler } from '../decorators/CheckPolicies.decorator'
-import { Action } from '../enums/action.enum'
+import { AppAbility } from '../../casl/casl.factory'
+import { IPolicyHandler } from '../../../common/decorators/CheckPolicies.decorator'
+import { Action } from '../../../common/enums/action.enum'
 
 @Injectable()
-class PolicyHandler implements IPolicyHandler {
+export class UpdateHolePolicyHandler implements IPolicyHandler {
   handle(ability: AppAbility, payload) {
     const res = ability.can(Action.Update, payload)
 
@@ -15,5 +15,3 @@ class PolicyHandler implements IPolicyHandler {
     return res
   }
 }
-
-export const UpdateHolePolicyHandler = new PolicyHandler()

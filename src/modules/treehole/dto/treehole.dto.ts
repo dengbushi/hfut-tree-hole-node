@@ -8,7 +8,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger'
 import { PaginationDto } from '../../../common/dto/pagination.schema'
 import { TreeholeConst } from '../../../shared/constant/treehole'
-import { IsTreeholeMode, IsValidIdDto } from './utils'
+import { IsTreeholeMode, IsValidHoleIdDto, IsValidId } from './utils'
 
 export class TreeholeListDto extends PaginationDto {
   @ApiProperty({ type: String, description: '树洞mode' })
@@ -20,7 +20,7 @@ export class TreeholeListDto extends PaginationDto {
     mode: string
 }
 
-export class TreeholeDetailDto extends IsValidIdDto {}
+export class TreeholeDetailDto extends IsValidHoleIdDto {}
 
 export class CreateHoleDto {
   @ApiProperty({ type: String, description: '正文' })
@@ -37,7 +37,7 @@ export class CreateHoleDto {
     imgs: string[]
 }
 
-export class CreateCommentDto extends IsValidIdDto {
+export class CreateCommentDto extends IsValidHoleIdDto {
   @ApiProperty({ type: String, description: '正文' })
   @IsString()
   @IsNotEmpty()
@@ -47,4 +47,12 @@ export class CreateCommentDto extends IsValidIdDto {
     content: string
 }
 
-export class StarHoleDto extends IsValidIdDto {}
+export class StarHoleDto extends IsValidHoleIdDto {}
+
+export class RemoveHoleCommentDto extends IsValidHoleIdDto {
+  @ApiProperty({ type: String, description: '留言id' })
+  @IsString()
+  @IsNotEmpty()
+  @IsValidId()
+    commentId: string
+}

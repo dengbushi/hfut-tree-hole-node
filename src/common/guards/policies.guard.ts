@@ -1,15 +1,20 @@
-import { CanActivate, ExecutionContext, Inject, Injectable, NotFoundException, UseGuards } from '@nestjs/common'
+import { CanActivate, ExecutionContext, Inject, Injectable, UseGuards } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { Request } from 'express'
+import { InjectModel } from '@nestjs/mongoose'
+import { Model } from 'mongoose'
 import { CHECK_POLICIES_KEY, PolicyHandler } from '../decorators/CheckPolicies.decorator'
 import { AppAbility, CaslAbilityFactory } from '../../modules/casl/casl.factory'
 import { TreeholeDaoService } from '../../dao/treehole/treehole-dao.service'
-import { Holes } from '../../schema/treehole/holes.schema'
+import { Holes, HolesDocument } from '../../schema/treehole/holes.schema'
 
 @Injectable()
 export class PoliciesGuard implements CanActivate {
   @Inject()
   private readonly treeholeDaoService: TreeholeDaoService
+
+  @InjectModel(Holes.name)
+  private readonly holesModel: Model<HolesDocument>
 
   constructor(
     private reflector: Reflector,
@@ -23,35 +28,20 @@ export class PoliciesGuard implements CanActivate {
         context.getHandler(),
       ) || []
 
-    const { user, body } = context.switchToHttp().getRequest() as Request
-    const ability = await this.caslAbilityFactory.createForUser(user)
+    const req = context.switchToHttp().getRequest() as Request
+    const ability = await this.caslAbilityFactory.createForUser(req.user)
 
-    let payload
-
-    if (body.id) {
-      const holeId = body.id as string
-      const hole = await this.treeholeDaoService.findById(holeId)
-
-      if (!hole) {
-        throw new NotFoundException('树洞不存在哎ε=(´ο｀*)))')
-      }
-
-      payload = new Holes({ userId: hole.userId })
-    } else {
-      payload = new Holes({ userId: user.studentId })
-    }
-
-    return policyHandlers.every(handler =>
-      this.execPolicyHandler(handler, ability, payload),
-    )
+    return policyHandlers.every(async(handler) => {
+      return await this.execPolicyHandler(handler, ability, req)
+    })
   }
 
-  private execPolicyHandler(handler: PolicyHandler, ability: AppAbility, payload: any) {
+  private async execPolicyHandler(handler: PolicyHandler, ability: AppAbility, req: Request) {
     if (typeof handler === 'function') {
-      return handler(ability, payload)
+      return handler(ability, req)
     }
 
-    return handler.handle(ability, payload)
+    return handler.handle(ability, req)
   }
 }
 

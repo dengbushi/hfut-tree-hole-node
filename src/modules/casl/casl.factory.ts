@@ -19,7 +19,10 @@ export class CaslAbilityFactory {
       Ability<[Action, Subjects]>
       >(Ability as AbilityClass<AppAbility>)
 
-    if (await this.roleService.isAdmin(user.studentId)) {
+    const isAdmin = await this.roleService.isAdmin(user.studentId)
+    const isBanned = await this.roleService.isBanned(user.studentId)
+
+    if (isAdmin) {
       can(Action.Manage, 'all') // read-write access to everything
     } else {
       can(Action.Read, 'all') // read-only access to everything
@@ -29,8 +32,6 @@ export class CaslAbilityFactory {
     can(Action.Create, Holes)
     can(Action.Update, Holes, { userId: user.studentId })
     can(Action.Delete, Holes, { userId: user.studentId })
-
-    const isBanned = await this.roleService.isBanned(user.studentId)
 
     if (isBanned) {
       cannot(Action.Create, Holes)

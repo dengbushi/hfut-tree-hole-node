@@ -49,13 +49,7 @@ export class ValidateId implements ValidatorConstraintInterface {
     const isValid = mongoose.isObjectIdOrHexString(id)
 
     if (!isValid) {
-      throw new BadRequestException('树洞id格式错误')
-    }
-
-    const isHoleExist = await this.treeholeDaoService.findById(id)
-
-    if (!isHoleExist) {
-      throw new NotFoundException('没有找到这个树洞哦~')
+      throw new BadRequestException('id格式错误')
     }
 
     return true
@@ -74,10 +68,45 @@ export function IsValidId(validationOptions?: ValidationOptions) {
   }
 }
 
-export class IsValidIdDto {
+@ValidatorConstraint({ async: true })
+@Injectable()
+export class ValidateHoleId implements ValidatorConstraintInterface {
+  @Inject()
+  private readonly treeholeDaoService: TreeholeDaoService
+
+  async validate(id: string, args: ValidationArguments) {
+    const isValid = mongoose.isObjectIdOrHexString(id)
+
+    if (!isValid) {
+      throw new BadRequestException('树洞id格式错误')
+    }
+
+    const isHoleExist = await this.treeholeDaoService.findById(id)
+
+    if (!isHoleExist) {
+      throw new NotFoundException('没有找到这个树洞哦~')
+    }
+
+    return true
+  }
+}
+
+export function IsValidHoleId(validationOptions?: ValidationOptions) {
+  return function(object: Object, propertyName: string) {
+    registerDecorator({
+      target: object.constructor,
+      propertyName,
+      options: validationOptions,
+      constraints: [],
+      validator: ValidateHoleId,
+    })
+  }
+}
+
+export class IsValidHoleIdDto {
   @ApiProperty({ type: Number, description: '树洞id' })
   @IsNotEmpty()
   @IsString()
-  @IsValidId()
+  @IsValidHoleId()
     id: string
 }

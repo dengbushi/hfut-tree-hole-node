@@ -7,6 +7,8 @@ import { AuthModule } from '../modules/auth/auth.module'
 import { JwtAuthGuard } from '../modules/auth/guard/jwt.guard'
 import { RolesGuard } from '../modules/role/guard/role.guard'
 import { Users, UsersSchema } from '../schema/user/user.schema'
+import { TreeholeDaoService } from '../dao/treehole/treehole-dao.service'
+import { Holes, HolesSchema } from '../schema/treehole/holes.schema'
 
 @Module({
   imports: [
@@ -18,6 +20,7 @@ import { Users, UsersSchema } from '../schema/user/user.schema'
     AuthModule,
     MongooseModule.forFeature([
       { name: Users.name, schema: UsersSchema },
+      { name: Holes.name, schema: HolesSchema },
     ]),
   ],
   providers: [
@@ -25,6 +28,7 @@ import { Users, UsersSchema } from '../schema/user/user.schema'
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
+    TreeholeDaoService,
   ],
 })
 export class CommonModule {}

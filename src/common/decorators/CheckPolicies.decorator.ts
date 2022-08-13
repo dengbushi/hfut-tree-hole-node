@@ -1,8 +1,9 @@
 import { SetMetadata } from '@nestjs/common'
+import { Request } from 'express'
 import { AppAbility } from '../../modules/casl/casl.factory'
 
 export interface IPolicyHandler {
-  handle: (ability: AppAbility, payload: any | undefined) => boolean
+  handle: (ability: AppAbility, req: Request) => boolean | Promise<boolean>
 }
 
 type PolicyHandlerCallback = IPolicyHandler['handle']
