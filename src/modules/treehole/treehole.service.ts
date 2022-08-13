@@ -1,4 +1,10 @@
-import { BadRequestException, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common'
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import mongoose, { Model } from 'mongoose'
 import { createResponse } from '../../shared/utils/create'
@@ -6,7 +12,6 @@ import { Holes, HolesDocument } from '../../schema/treehole/holes.schema'
 import { TreeholeDaoService } from '../../dao/treehole/treehole-dao.service'
 import { IUser } from '../../env'
 import { CaslAbilityFactory } from '../casl/casl.factory'
-import { Action } from '../../common/enums/action.enum'
 import { Role } from '../role/role.enum'
 import {
   CreateCommentDto,
@@ -60,14 +65,6 @@ export class TreeholeService {
   }
 
   async removeHole(dto: IsValidHoleIdDto, user: IUser) {
-    const hole = await this.treeholeDaoService.findById(dto.id)
-
-    const ability = await this.caslFacotry.createForUser(user)
-
-    if (!ability.can(Action.Delete, new Holes(hole))) {
-      throw new BadRequestException('你不能删除别人的树洞哦~')
-    }
-
     try {
       await this.holesModel.deleteOne({ _id: new mongoose.Types.ObjectId(dto.id) })
 

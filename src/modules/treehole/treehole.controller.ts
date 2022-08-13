@@ -4,10 +4,8 @@ import { Request } from 'express'
 import { Roles } from '../../common/decorators/roles.decorator'
 import { Role } from '../role/role.enum'
 import { Police } from '../../common/guards/policies.guard'
-import { CheckPolicies } from '../../common/decorators/CheckPolicies.decorator'
 import { TreeholeDaoService } from '../../dao/treehole/treehole-dao.service'
-import { CreateHolePolicyHandler } from './policies/create.police'
-import { DeleteHolePolicyHandler } from './policies/delete.police'
+import { CheckPolicies } from '../../common/decorators/CheckPolicies.decorator'
 import { TreeholeService } from './treehole.service'
 import {
   CreateCommentDto,
@@ -19,6 +17,7 @@ import {
 } from './dto/treehole.dto'
 import { ModeService } from './mode.service'
 import { IsValidHoleIdDto } from './dto/utils'
+import { DeleteHolePolicyHandler } from './policies/delete.police'
 
 @ApiTags('树洞模块')
 @ApiBearerAuth()
@@ -50,7 +49,6 @@ export class TreeholeController {
     return this.treeholeService.getDetail(dto, req.user)
   }
 
-  @CheckPolicies(new CreateHolePolicyHandler())
   @Post('create')
   async createHole(
     @Body() dto: CreateHoleDto,
@@ -60,7 +58,7 @@ export class TreeholeController {
   }
 
   @CheckPolicies(new DeleteHolePolicyHandler())
-  @Post('remove')
+  @Delete('remove')
   async removeHole(
     @Body() dto: IsValidHoleIdDto,
     @Req() req: Request,
