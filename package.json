@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "@casl/ability": "^6.0.0",
-    "@casl/mongoose": "^7.0.0",
     "@nestjs/common": "^8.0.0",
     "@nestjs/config": "^2.1.0",
     "@nestjs/core": "^8.0.0",

@@ -3,8 +3,6 @@ import { NestFactory } from '@nestjs/core'
 import helmet from 'helmet'
 import { useContainer } from 'class-validator'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
-import mongoose from 'mongoose'
-import { accessibleRecordsPlugin } from '@casl/mongoose'
 import { AppModule } from './app.module'
 import { HttpExceptionFilter } from './common/filters/http-exception.filter'
 
@@ -57,15 +55,10 @@ function setupGlobalHandler(app: INestApplication) {
   })
 }
 
-function setupEnv() {
-  mongoose.plugin(accessibleRecordsPlugin)
-}
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
 
   setupGlobalHandler(app)
-  setupEnv()
 
   await app.listen(8000)
 }
