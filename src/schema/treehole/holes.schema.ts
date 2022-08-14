@@ -17,6 +17,10 @@ export class Comment {
 
   @Prop(Date)
     createTime: Date
+
+  constructor(attrs) {
+    Object.assign(this, attrs)
+  }
 }
 
 @BaseSchema()

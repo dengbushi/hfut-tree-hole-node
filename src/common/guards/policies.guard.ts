@@ -40,7 +40,9 @@ export class PoliciesGuard implements CanActivate {
     }
 
     return policyHandlers.every(async(handler) => {
-      return await this.execPolicyHandler(handler, ability, req, models)
+      try {
+        return await this.execPolicyHandler(handler, ability, req, models)
+      } catch (err) {}
     })
   }
 
@@ -50,11 +52,15 @@ export class PoliciesGuard implements CanActivate {
     req: Request,
     models: PoliciesModel,
   ) {
+    let fn
+
     if (typeof handler === 'function') {
-      return handler(ability, req, models)
+      fn = handler
+    } else {
+      fn = handler.handle
     }
 
-    return handler.handle(ability, req, models)
+    return fn(ability, req, models)
   }
 }
 

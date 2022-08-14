@@ -1,8 +1,8 @@
 import {
+  BadRequestException,
   CanActivate,
   ExecutionContext,
   Injectable,
-  UnauthorizedException,
 } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { Request } from 'express'
@@ -33,22 +33,23 @@ export class RolesGuard implements CanActivate {
     if (!requiredRoles || isPublic) {
       return true
     }
+
     const { user: reqUser } = context.switchToHttp().getRequest() as Request
 
     const user = await this.usersModel.findOne({ studentId: reqUser.studentId })
 
-    if (requiredRoles.includes(Role.Admin)) {
+    if (user.roles.includes(Role.Admin)) {
       return true
     }
 
     if (!requiredRoles.includes(Role.Banned) && user.roles.includes(Role.Banned)) {
-      throw new UnauthorizedException('你已被关进小黑屋')
+      throw new BadRequestException('你已被关进小黑屋')
     }
 
     const hasRole = requiredRoles.some(role => user.roles?.includes(role))
 
     if (!hasRole) {
-      throw new UnauthorizedException('权限不足')
+      throw new BadRequestException('权限不足')
     }
 
     return true

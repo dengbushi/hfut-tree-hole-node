@@ -2,10 +2,10 @@ import { Ability, AbilityBuilder, AbilityClass, ExtractSubjectType, InferSubject
 import { Inject, Injectable } from '@nestjs/common'
 import { Action } from '../../common/enums/action.enum'
 import { IUser } from '../../env'
-import { Holes } from '../../schema/treehole/holes.schema'
+import { Comment, Holes } from '../../schema/treehole/holes.schema'
 import { RoleService } from '../role/role.service'
 
-type Subjects = InferSubjects<typeof Holes> | 'all'
+type Subjects = InferSubjects<typeof Holes | typeof Comment> | 'all'
 
 export type AppAbility = Ability<[Action, Subjects]>
 
@@ -23,9 +23,9 @@ export class CaslAbilityFactory {
     const isBanned = await this.roleService.isBanned(user.studentId)
 
     if (isAdmin) {
-      can(Action.Manage, 'all') // read-write access to everything
+      can(Action.Manage, 'all')
     } else {
-      can(Action.Read, 'all') // read-only access to everything
+      can(Action.Read, 'all')
     }
 
     can(Action.Read, Holes)
@@ -33,10 +33,11 @@ export class CaslAbilityFactory {
     can(Action.Update, Holes, { userId: user.studentId })
     can(Action.Delete, Holes, { userId: user.studentId })
 
+    can(Action.Delete, Comment, { userId: user.studentId })
+    can(Action.Create, Comment)
+
     if (isBanned) {
-      cannot(Action.Create, Holes)
-      cannot(Action.Update, Holes)
-      cannot(Action.Delete, Holes)
+      cannot(Action.Manage, 'all')
     }
 
     return build({

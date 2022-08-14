@@ -71,6 +71,7 @@ export class TreeholeController {
     return this.treeholeService.createComment(dto, req.user)
   }
 
+  @CheckPolicies()
   @Delete('comment')
   async removeComment(
     @Body() dto: RemoveHoleCommentDto,

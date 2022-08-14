@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common'
+import { BadRequestException, Inject, Injectable, InternalServerErrorException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Users, UsersDocument } from '../../schema/user/user.schema'
@@ -22,6 +22,26 @@ export class RoleService {
     }
 
     return createResponse('熊孩子已被关进小黑屋')
+  }
+
+  async liberate(id: number) {
+    const user = await this.userService.findOne(id)
+
+    if (!user.roles.includes(Role.Banned)) {
+      throw new BadRequestException('这个人还不是熊孩子呢')
+    }
+
+    try {
+      await this.usersModel.updateOne({ studentId: id }, {
+        $pull: {
+          roles: Role.Banned,
+        },
+      })
+
+      return createResponse('成功释放熊孩子，以后要多注意它哦')
+    } catch (err) {
+      throw new InternalServerErrorException('释放熊孩子的过程中出了点故障...')
+    }
   }
 
   async banUser(id: number) {

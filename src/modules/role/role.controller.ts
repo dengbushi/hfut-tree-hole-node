@@ -16,4 +16,9 @@ export class RoleController {
   async ban(@Body() dto: StudentIdDataWithValidateExistDto) {
     return this.roleService.ban(dto.studentId)
   }
+
+  @Post('liberate')
+  async liberate(@Body() dto: StudentIdDataWithValidateExistDto) {
+    return this.roleService.liberate(dto.studentId)
+  }
 }

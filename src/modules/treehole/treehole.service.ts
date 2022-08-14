@@ -130,7 +130,7 @@ export class TreeholeService {
     const isStared = (await this.holesModel.findById(dto.id)).starUserIds.includes(user.studentId)
 
     if (isStared) {
-      throw new BadRequestException('树洞star重复')
+      throw new BadRequestException('你已经star过该树洞啦~')
     }
 
     try {
@@ -148,10 +148,12 @@ export class TreeholeService {
   }
 
   async removeStar(dto: StarHoleDto, user: IUser) {
-    const isStared = (await this.holesModel.findById(dto.id)).starUserIds.includes(user.studentId)
+    const hole = await this.holesModel.findById(dto.id)
+
+    const isStared = hole.starUserIds.includes(user.studentId)
 
     if (!isStared) {
-      throw new BadRequestException('不能删除不存在的star')
+      throw new BadRequestException('你还没有star该树洞哦~')
     }
 
     try {

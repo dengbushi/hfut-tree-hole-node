@@ -15,7 +15,7 @@ export class UserService {
   private readonly usersModel: Model<UsersDocument>
 
   async getUserInfo(payload: IUser) {
-    const user = await this.findOne(payload.studentId, 'password')
+    const user = await this.usersModel.findOne({ studentId: payload.studentId })
 
     if (!user) {
       throw new NotAcceptableException('用户信息获取失败')
