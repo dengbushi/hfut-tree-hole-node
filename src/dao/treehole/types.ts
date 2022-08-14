@@ -1,14 +1,25 @@
-export interface ITreeholeDetailPipeLineStage {
+interface Base {
   _id: string
   content: string
   stars: number
   imgs: any[]
-  comments: Comment[]
+
   createTime: string
   user: User
   comments_user: CommentsUser[]
   starUserIds: number[]
   isStar: boolean
+}
+
+export interface ITreeholeDetailPipeLineStage extends Base{
+  comments: Comment[]
+}
+
+export interface ITreeholeListPipeLineStage extends Base {
+  comments: {
+    data: Comment[]
+    length: number
+  }
 }
 
 interface Comment {
@@ -20,7 +31,7 @@ interface Comment {
 
 interface User {
   username: string
-  role: string
+  role?: string
 }
 
 interface CommentsUser {

@@ -4,7 +4,7 @@ import Mongoose, { Model, PipelineStage } from 'mongoose'
 import { Holes, HolesDocument } from '../../schema/treehole/holes.schema'
 import { TreeholeListDto } from '../../modules/treehole/dto/treehole.dto'
 import { unset } from '../../shared/utils/object'
-import { ITreeholeDetailPipeLineStage } from './types'
+import { ITreeholeDetailPipeLineStage, ITreeholeListPipeLineStage } from './types'
 import { isStarHole } from './utils'
 
 @Injectable()
@@ -44,19 +44,26 @@ export class TreeholeDaoService {
         },
       },
       {
+        $lookup: {
+          from: 'users',
+          localField: 'comments.data.userId',
+          foreignField: 'studentId',
+          as: 'comments_user',
+        },
+      },
+      {
         $project: {
-          'userId': 0,
-          'user': {
+          userId: 0,
+          user: {
             _id: 0,
             studentId: 0,
             password: 0,
             holeIds: 0,
             __v: 0,
-            role: 0,
+            roles: 0,
           },
-          '__v': 0,
-          'updatedTime': 0,
-          'comments.userId': 0,
+          __v: 0,
+          updatedTime: 0,
         },
       },
       sort,
@@ -84,13 +91,28 @@ export class TreeholeDaoService {
     }
 
     try {
-      const queryRes = await this.holesModel.aggregate(pipeLineStage) as ITreeholeDetailPipeLineStage[]
+      const queryRes = await this.holesModel.aggregate(pipeLineStage) as ITreeholeListPipeLineStage[]
+
       return queryRes.map((item) => {
-        item.isStar = isStarHole(item.starUserIds, userId)
-        unset(item, 'starUserIds')
+        item.comments.data = item.comments.data.map((commentItem) => {
+          const user = item.comments_user.find(userItem => userItem.studentId)!
+
+          commentItem = {
+            ...commentItem,
+            user: {
+              username: user.username,
+            },
+          }
+
+          unset(commentItem, 'userId')
+
+          return commentItem
+        })
+
         return item
       })
     } catch (err) {
+      console.log(err)
       throw new InternalServerErrorException('获取树洞列表失败')
     }
   }
@@ -116,7 +138,15 @@ export class TreeholeDaoService {
         foreignField: 'studentId',
         as: 'comments_user',
       },
-    }, {
+    },
+    {
+      $addFields: {
+        comments_length: {
+          $size: '$comments',
+        },
+      },
+    },
+    {
       $project: {
         userId: 0,
         user: {
