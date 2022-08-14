@@ -109,6 +109,8 @@ export class TreeholeDaoService {
           return commentItem
         })
 
+        unset(item, 'comments_user')
+
         return item
       })
     } catch (err) {
