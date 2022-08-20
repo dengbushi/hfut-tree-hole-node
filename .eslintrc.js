@@ -16,7 +16,6 @@ module.exports = {
     "files": ["*"],
     "rules": {
       "curly": [2, "all"],
-      "no-console": "off",
       "brace-style": [2, "1tbs", { "allowSingleLine": true }],
       "no-useless-return": "off",
       "prefer-const": "off",
