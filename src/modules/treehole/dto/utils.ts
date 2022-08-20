@@ -1,8 +1,6 @@
 import {
-  IsNotEmpty,
-  IsString,
-  ValidationArguments,
-  ValidationOptions, ValidatorConstraint, ValidatorConstraintInterface, registerDecorator,
+  IsNumber,
+  ValidationArguments, ValidationOptions, ValidatorConstraint, ValidatorConstraintInterface, registerDecorator,
 } from 'class-validator'
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
@@ -10,6 +8,7 @@ import mongoose, { Model } from 'mongoose'
 import { ApiProperty } from '@nestjs/swagger'
 import { TreeholeMode } from '../../../schema/treehole/treeholeMode.schema'
 import { TreeholeDaoService } from '../../../dao/treehole/treehole-dao.service'
+import { Holes, HolesDocument } from '../../../schema/treehole/holes.schema'
 
 @ValidatorConstraint({ async: true })
 @Injectable()
@@ -71,17 +70,14 @@ export function IsValidId(validationOptions?: ValidationOptions) {
 @ValidatorConstraint({ async: true })
 @Injectable()
 export class ValidateHoleId implements ValidatorConstraintInterface {
-  @Inject()
-  private readonly treeholeDaoService: TreeholeDaoService
+  @InjectModel(Holes.name)
+  private readonly holesModel: Model<HolesDocument>
 
-  async validate(id: string, args: ValidationArguments) {
-    const isValid = mongoose.isObjectIdOrHexString(id)
-
-    if (!isValid) {
-      throw new BadRequestException('树洞id格式错误')
+  async validate(id: unknown, args: ValidationArguments) {
+    if (isNaN(id as number)) {
+      throw new BadRequestException('id格式错误')
     }
-
-    const isHoleExist = await this.treeholeDaoService.findById(id)
+    const isHoleExist = await this.holesModel.findOne({ id })
 
     if (!isHoleExist) {
       throw new NotFoundException('没有找到这个树洞哦~')
@@ -105,8 +101,7 @@ export function IsValidHoleId(validationOptions?: ValidationOptions) {
 
 export class IsValidHoleIdDto {
   @ApiProperty({ type: Number, description: '树洞id' })
-  @IsNotEmpty()
-  @IsString()
   @IsValidHoleId()
-    id: string
+  @IsNumber({ allowNaN: false, allowInfinity: false })
+    id: number
 }

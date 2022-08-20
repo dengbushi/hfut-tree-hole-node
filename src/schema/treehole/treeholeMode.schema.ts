@@ -15,6 +15,10 @@ export const treeholeModeDefaultData: TTreeholeMode[] = [
     cn: '时间轴',
   },
   {
+    value: 'timeline-reverse',
+    cn: '时间轴倒叙',
+  },
+  {
     value: 'random',
     cn: '随机漫步',
   },

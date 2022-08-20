@@ -19,12 +19,28 @@ export class ModeService {
   }
 
   async initModeData() {
-    const modes = await this.modeModel.find()
+    const modes = await this.modeModel.findOne()
 
-    if (_.isEmpty(modes)) {
+    if (_.isEmpty(modes?.modes)) {
       await new this.modeModel({
         modes: treeholeModeDefaultData,
       }).save()
+
+      return
+    }
+
+    if (modes.modes.length !== treeholeModeDefaultData.length) {
+      for (const item of treeholeModeDefaultData) {
+        const flag = modes.modes.some(MItem => _.isEqual(item, MItem))
+
+        if (!flag) {
+          await this.modeModel.updateOne({ _id: modes._id }, {
+            $set: {
+              modes: treeholeModeDefaultData,
+            },
+          })
+        }
+      }
     }
   }
 

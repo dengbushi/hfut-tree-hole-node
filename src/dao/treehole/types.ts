@@ -3,7 +3,6 @@ interface Base {
   content: string
   stars: number
   imgs: any[]
-
   createTime: string
   user: User
   comments_user: CommentsUser[]
@@ -27,6 +26,7 @@ interface Comment {
   user?: { username?: string }
   content: string
   createTime: string
+  isOwner: boolean
 }
 
 interface User {

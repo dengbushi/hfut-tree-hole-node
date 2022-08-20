@@ -26,6 +26,9 @@ export class Comment {
 @BaseSchema()
 export class Holes {
   @Prop({ type: Number, index: 1, required: true })
+    id: number
+
+  @Prop({ type: Number, index: 1, required: true })
     userId: number
 
   @Prop({ type: String, required: true })

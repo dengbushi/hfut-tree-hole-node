@@ -13,7 +13,7 @@ import { Holes, HolesSchema } from '../schema/treehole/holes.schema'
 @Module({
   imports: [
     ThrottlerModule.forRoot({
-      limit: 2,
+      limit: 10,
       ttl: 1,
     }),
     ConfigModule,

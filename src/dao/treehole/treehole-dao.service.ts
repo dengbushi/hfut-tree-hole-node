@@ -53,6 +53,7 @@ export class TreeholeDaoService {
       },
       {
         $project: {
+          _id: 0,
           userId: 0,
           user: {
             _id: 0,
@@ -85,7 +86,7 @@ export class TreeholeDaoService {
           },
         },
       })
-    } else if (mode === 'timeline') {
+    } else if (mode.includes('timeline')) {
       const sortIdx = pipeLineStage.findIndex(item => item === sort)
       pipeLineStage.splice(sortIdx, 1, { $sort: { createdTime: -1 } })
     }
@@ -114,15 +115,14 @@ export class TreeholeDaoService {
         return item
       })
     } catch (err) {
-      console.log(err)
       throw new InternalServerErrorException('获取树洞列表失败')
     }
   }
 
-  async getDetail(id: string, userId: number) {
+  async getDetail(id: number, userId: number) {
     const pipeLineStage: PipelineStage[] = [{
       $match: {
-        _id: new Mongoose.Types.ObjectId(id),
+        id,
       },
     }, {
       $lookup: {
@@ -151,6 +151,7 @@ export class TreeholeDaoService {
     {
       $project: {
         userId: 0,
+        _id: 0,
         user: {
           _id: 0,
           studentId: 0,
@@ -172,6 +173,7 @@ export class TreeholeDaoService {
 
       item = {
         ...item,
+        isOwner: user.studentId === userId,
         user: {
           username: user.username,
         },
@@ -188,7 +190,7 @@ export class TreeholeDaoService {
     return res
   }
 
-  async findById(id: string) {
-    return this.holesModel.findById(id)
+  async findById(id: number) {
+    return this.holesModel.findOne({ id })
   }
 }

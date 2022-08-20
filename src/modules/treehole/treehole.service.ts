@@ -46,19 +46,23 @@ export class TreeholeService {
 
       return createResponse('获取树洞详情成功', res)
     } catch (err) {
+      console.log(err)
       throw new InternalServerErrorException('获取树洞详情失败')
     }
   }
 
   async createHole(dto: CreateHoleDto, user: IUser) {
+    const holeList = await this.holesModel.find({})
+
     try {
       const hole = await new this.holesModel({
         userId: user.studentId,
         ...dto,
+        id: holeList.length + 1,
         stars: Number(Math.random() * 1000).toFixed(0),
       }).save()
 
-      return createResponse('创建树洞成功', { _id: hole._id })
+      return createResponse('创建树洞成功', { id: hole.id })
     } catch (err) {
       throw new InternalServerErrorException('创建树洞失败')
     }
@@ -66,7 +70,7 @@ export class TreeholeService {
 
   async removeHole(dto: IsValidHoleIdDto, user: IUser) {
     try {
-      await this.holesModel.deleteOne({ _id: new mongoose.Types.ObjectId(dto.id) })
+      await this.holesModel.deleteOne({ id: dto.id })
 
       return createResponse('删除成功')
     } catch (err) {
@@ -77,7 +81,7 @@ export class TreeholeService {
   async createComment(dto: CreateCommentDto, user: IUser) {
     try {
       const id = new mongoose.Types.ObjectId()
-      await this.holesModel.updateOne({ _id: dto.id }, {
+      await this.holesModel.updateOne({ id: dto.id }, {
         $push: {
           comments: {
             _id: id,
@@ -90,6 +94,7 @@ export class TreeholeService {
 
       return createResponse('留言成功', { commentId: id })
     } catch (err) {
+      console.log(err)
       throw new InternalServerErrorException('留言失败')
     }
   }
@@ -114,7 +119,7 @@ export class TreeholeService {
     }
 
     try {
-      await this.holesModel.updateOne({ _id: dto.id }, {
+      await this.holesModel.updateOne({ id: dto.id }, {
         $pull: {
           comments: { _id: commentId },
         },
@@ -127,14 +132,14 @@ export class TreeholeService {
   }
 
   async starHole(dto: StarHoleDto, user: IUser) {
-    const isStared = (await this.holesModel.findById(dto.id)).starUserIds.includes(user.studentId)
+    const isStared = (await this.treeholeDaoService.findById(dto.id)).starUserIds.includes(user.studentId)
 
     if (isStared) {
       throw new BadRequestException('你已经star过该树洞啦~')
     }
 
     try {
-      await this.holesModel.updateOne({ _id: dto.id }, {
+      await this.holesModel.updateOne({ id: dto.id }, {
         $inc: { stars: 1 },
         $push: {
           starUserIds: user.studentId as any,
@@ -148,7 +153,7 @@ export class TreeholeService {
   }
 
   async removeStar(dto: StarHoleDto, user: IUser) {
-    const hole = await this.holesModel.findById(dto.id)
+    const hole = await this.treeholeDaoService.findById(dto.id)
 
     const isStared = hole.starUserIds.includes(user.studentId)
 
@@ -157,7 +162,7 @@ export class TreeholeService {
     }
 
     try {
-      await this.holesModel.updateOne({ _id: new mongoose.Types.ObjectId(dto.id) }, {
+      await this.holesModel.updateOne({ id: dto.id }, {
         $pull: {
           starUserIds: user.studentId as any,
         },
@@ -167,12 +172,5 @@ export class TreeholeService {
     } catch (err) {
       throw new InternalServerErrorException('star删除失败')
     }
-  }
-
-  async findHole(id: string) {
-    const article = await this.treeholeDaoService.findById(id)
-    return new Holes({
-      userId: article.userId,
-    })
   }
 }
