@@ -1,4 +1,4 @@
 export const TreeholeConst = {
-  maxContentLength: 1000,
+  maxContentLength: 5000,
   maxCommentLength: 300,
 }

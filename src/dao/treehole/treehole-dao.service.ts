@@ -154,10 +154,10 @@ export class TreeholeDaoService {
         _id: 0,
         user: {
           _id: 0,
-          studentId: 0,
           password: 0,
           holeIds: 0,
           __v: 0,
+          roles: 0,
         },
         __v: 0,
         updatedTime: 0,
@@ -165,6 +165,8 @@ export class TreeholeDaoService {
     }]
 
     const res = (await this.holesModel.aggregate(pipeLineStage))[0] as ITreeholeDetailPipeLineStage
+
+    res.isOwner = res.user.studentId === userId
 
     res.comments = res.comments.map((item) => {
       const user = res.comments_user.filter(commentItem => commentItem.studentId === item.userId)[0]
@@ -181,6 +183,8 @@ export class TreeholeDaoService {
 
       return item
     })
+
+    unset(res.user, 'studentId')
 
     unset(res, 'comments_user')
 

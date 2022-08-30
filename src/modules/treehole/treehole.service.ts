@@ -7,12 +7,14 @@ import {
 } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import mongoose, { Model } from 'mongoose'
+import type { HoleDetailDocument } from 'src/schema/treehole/holeDetail.schema'
 import { createResponse } from '../../shared/utils/create'
 import { Holes, HolesDocument } from '../../schema/treehole/holes.schema'
 import { TreeholeDaoService } from '../../dao/treehole/treehole-dao.service'
 import { IUser } from '../../env'
 import { CaslAbilityFactory } from '../casl/casl.factory'
 import { Role } from '../role/role.enum'
+import { HoleDetail } from '../../schema/treehole/holeDetail.schema'
 import {
   CreateCommentDto,
   CreateHoleDto,
@@ -30,6 +32,9 @@ export class TreeholeService {
 
   @Inject()
   private readonly treeholeDaoService: TreeholeDaoService
+
+  @InjectModel(HoleDetail.name)
+  private readonly holeDetailModel: Model<HoleDetailDocument>
 
   @Inject()
   private readonly caslFacotry: CaslAbilityFactory
@@ -94,7 +99,6 @@ export class TreeholeService {
 
       return createResponse('留言成功', { commentId: id })
     } catch (err) {
-      console.log(err)
       throw new InternalServerErrorException('留言失败')
     }
   }

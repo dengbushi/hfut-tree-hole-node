@@ -12,6 +12,7 @@ interface Base {
 
 export interface ITreeholeDetailPipeLineStage extends Base{
   comments: Comment[]
+  isOwner: boolean
 }
 
 export interface ITreeholeListPipeLineStage extends Base {
@@ -31,6 +32,7 @@ interface Comment {
 
 interface User {
   username: string
+  studentId: number
   role?: string
 }
 

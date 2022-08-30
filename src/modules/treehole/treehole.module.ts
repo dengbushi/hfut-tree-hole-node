@@ -8,6 +8,7 @@ import { RoleService } from '../role/role.service'
 import { Users, UsersSchema } from '../../schema/user/user.schema'
 import { UserService } from '../user/user.service'
 import { CaslAbilityFactory } from '../casl/casl.factory'
+import { HoleDetail, HoleDetailSchema } from '../../schema/treehole/holeDetail.schema'
 import { TreeholeController } from './treehole.controller'
 import { TreeholeService } from './treehole.service'
 import { ModeService } from './mode.service'
@@ -22,6 +23,7 @@ import { UpdateHolePolicyHandler } from './policies/update.police'
       { name: TreeholeMode.name, schema: TreeholeModeSchema },
       { name: Holes.name, schema: HolesSchema },
       { name: Users.name, schema: UsersSchema },
+      { name: HoleDetail.name, schema: HoleDetailSchema },
     ]),
     RoleModule,
   ],
