@@ -32,6 +32,5 @@ import databaseConfig from './config/database.config'
     CaslModule,
   ],
   controllers: [],
-  providers: [],
 })
 export class AppModule {}

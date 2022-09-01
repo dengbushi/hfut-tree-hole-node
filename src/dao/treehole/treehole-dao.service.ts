@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import Mongoose, { Model, PipelineStage } from 'mongoose'
+import { Model, PipelineStage } from 'mongoose'
 import { Holes, HolesDocument } from '../../schema/treehole/holes.schema'
 import { TreeholeListDto } from '../../modules/treehole/dto/treehole.dto'
 import { unset } from '../../shared/utils/object'

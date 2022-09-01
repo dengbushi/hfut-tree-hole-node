@@ -9,13 +9,11 @@ import { Users, UsersSchema } from '../../schema/user/user.schema'
 import { UserService } from '../user/user.service'
 import { CaslAbilityFactory } from '../casl/casl.factory'
 import { HoleDetail, HoleDetailSchema } from '../../schema/treehole/holeDetail.schema'
+import { UserDaoService } from '../../dao/user/user.service'
 import { TreeholeController } from './treehole.controller'
 import { TreeholeService } from './treehole.service'
 import { ModeService } from './mode.service'
 import { IsModeExist, ValidateHoleId, ValidateId } from './dto/utils'
-import { CreateHolePolicyHandler } from './policies/create.police'
-import { DeleteHolePolicyHandler } from './policies/delete.police'
-import { UpdateHolePolicyHandler } from './policies/update.police'
 
 @Module({
   imports: [
@@ -38,9 +36,7 @@ import { UpdateHolePolicyHandler } from './policies/update.police'
     CaslAbilityFactory,
     RoleService,
     UserService,
-    CreateHolePolicyHandler,
-    DeleteHolePolicyHandler,
-    UpdateHolePolicyHandler,
+    UserDaoService,
   ],
 })
 export class TreeholeModule {}
