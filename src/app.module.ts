@@ -8,7 +8,7 @@ import { TreeholeModule } from './modules/treehole/treehole.module'
 import { DaoModule } from './dao/dao.module'
 import { RoleModule } from './modules/role/role.module'
 import { CaslModule } from './modules/casl/casl.module'
-import { FileModule } from './modules/file/file.module';
+import { FileModule } from './modules/file/file.module'
 import databaseConfig from './config/database.config'
 
 @Module({
