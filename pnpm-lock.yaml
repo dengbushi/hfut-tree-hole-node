@@ -2,6 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@antfu/eslint-config': ^0.18.9
+  '@antfu/ni': ^0.18.0
   '@casl/ability': ^6.0.0
   '@liaoliaots/nestjs-redis': ^9.0.2
   '@nestjs/cli': ^8.0.0
@@ -12,10 +13,12 @@ specifiers:
   '@nestjs/mongoose': ^9.2.0
   '@nestjs/passport': ^8.2.1
   '@nestjs/platform-express': ^8.0.0
+  '@nestjs/schedule': ^2.1.0
   '@nestjs/schematics': ^8.0.0
   '@nestjs/swagger': ^5.2.1
   '@nestjs/testing': ^8.0.0
   '@nestjs/throttler': ^2.0.1
+  '@types/cron': ^2.0.0
   '@types/express': ^4.17.13
   '@types/jest': 27.0.2
   '@types/lodash': ^4.14.183
@@ -72,6 +75,7 @@ dependencies:
   '@nestjs/mongoose': 9.2.0_l3fbe6rabz7rmn73ll52ejazja
   '@nestjs/passport': 8.2.1_tomt3efwataot452bidx2daqie
   '@nestjs/platform-express': 8.4.3_2br7sjvwli636vv4fpjrn732yu
+  '@nestjs/schedule': 2.1.0_ipjxl2ycneyzimzveiyqfqi6pi
   '@nestjs/swagger': 5.2.1_3f4iln5ekwdvup7udoca3sq3wi
   '@nestjs/throttler': 2.0.1_ipjxl2ycneyzimzveiyqfqi6pi
   axios: 0.26.1
@@ -96,9 +100,11 @@ dependencies:
 
 devDependencies:
   '@antfu/eslint-config': 0.18.9_thk3xo4exzjr5rl6cnexo7v6re
+  '@antfu/ni': 0.18.0
   '@nestjs/cli': 8.2.4
   '@nestjs/schematics': 8.0.8_typescript@4.6.3
   '@nestjs/testing': 8.4.3_xpt7l3aciijyfskp2wqigoq3je
+  '@types/cron': 2.0.0
   '@types/express': 4.17.13
   '@types/jest': 27.0.2
   '@types/lodash': 4.14.183
@@ -341,6 +347,11 @@ packages:
       - eslint-import-resolver-webpack
       - supports-color
       - typescript
+    dev: true
+
+  /@antfu/ni/0.18.0:
+    resolution: {integrity: sha512-D0eek5EV8wOUpZNVAs/mPyeC5TMWFXqchqCyPiR6Lj5FgmSJw0EpFLqAczHX0O5+Jc07N7NBwBip85Gi1MBJnA==}
+    hasBin: true
     dev: true
 
   /@babel/code-frame/7.16.7:
@@ -1150,6 +1161,20 @@ packages:
     transitivePeerDependencies:
       - supports-color
 
+  /@nestjs/schedule/2.1.0_ipjxl2ycneyzimzveiyqfqi6pi:
+    resolution: {integrity: sha512-4Xaw56WiW3VsxEPPnj/iDtfjcO+sUZyYAeRxD0gnF5havncxjAnv52Iw7UH3DuzzUA784xPGgGje3Fq0Gu925g==}
+    peerDependencies:
+      '@nestjs/common': ^7.0.0 || ^8.0.0 || ^9.0.0
+      '@nestjs/core': ^7.0.0 || ^8.0.0 || ^9.0.0
+      reflect-metadata: ^0.1.12
+    dependencies:
+      '@nestjs/common': 9.0.11_kgmvgmqc4iohdboj3f7yqhrie4
+      '@nestjs/core': 8.4.3_gla3k3zgcikejmpitkwpay7oty
+      cron: 2.0.0
+      reflect-metadata: 0.1.13
+      uuid: 8.3.2
+    dev: false
+
   /@nestjs/schematics/8.0.8_ezuyfu3uj65g35wdjb6342atpm:
     resolution: {integrity: sha512-xIIb5YnMQN/OJQ68+MCapy2bXvTxSWgINoqQbyZWkLL/yTIuROvZCdtV850NPGyr7f7l93VBP0ZPitbFIexy3Q==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npm.taobao.org/@nestjs/schematics/-/schematics-8.0.8.tgz}
     peerDependencies:
@@ -1350,6 +1375,13 @@ packages:
     resolution: {integrity: sha512-t73xJJrvdTjXrn4jLS9VSGRbz0nUY3cl2DMGDU48lKl+HR9dbbjW2A9r3g40VA++mQpy6uuHg33gy7du2BKpog==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npm.taobao.org/@types/cookiejar/-/cookiejar-2.1.2.tgz}
     dev: true
 
+  /@types/cron/2.0.0:
+    resolution: {integrity: sha512-xZM08fqvwIXgghtPVkSPKNgC+JoMQ2OHazEvyTKnNf7aWu1aB6/4lBbQFrb03Td2cUGG7ITzMv3mFYnMu6xRaQ==}
+    dependencies:
+      '@types/luxon': 3.0.1
+      '@types/node': 16.11.26
+    dev: true
+
   /@types/eslint-scope/3.7.3:
     resolution: {integrity: sha512-PB3ldyrcnAicT35TWPs5IcwKD8S333HMaa2VVv4+wdvebJkjWuW/xESoB8IwRcog8HYVYamb1g/R31Qv5Bx03g==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npm.taobao.org/@types/eslint-scope/-/eslint-scope-3.7.3.tgz}
     dependencies:
@@ -1429,6 +1461,10 @@ packages:
 
   /@types/lodash/4.14.183:
     resolution: {integrity: sha512-UXavyuxzXKMqJPEpFPri6Ku5F9af6ZJXUneHhvQJxavrEjuHkFp2YnDWHcxJiG7hk8ZkWqjcyNeW1s/smZv5cw==}
+    dev: true
+
+  /@types/luxon/3.0.1:
+    resolution: {integrity: sha512-/LAvk1cMOJt0ghzMFrZEvByUhsiEfeeT2IF53Le+Ki3A538yEL9pRZ7a6MuCxdrYK+YNqNIDmrKU/r2nnw04zQ==}
     dev: true
 
   /@types/mdast/3.0.10:
@@ -2553,6 +2589,12 @@ packages:
   /create-require/1.1.1:
     resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npm.taobao.org/create-require/-/create-require-1.1.1.tgz}
     dev: true
+
+  /cron/2.0.0:
+    resolution: {integrity: sha512-RPeRunBCFr/WEo7WLp8Jnm45F/ziGJiHVvVQEBSDTSGu6uHW49b2FOP2O14DcXlGJRLhwE7TIoDzHHK4KmlL6g==}
+    dependencies:
+      luxon: 1.28.0
+    dev: false
 
   /cross-spawn/7.0.3:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npm.taobao.org/cross-spawn/-/cross-spawn-7.0.3.tgz}
@@ -4956,6 +4998,10 @@ packages:
     dependencies:
       yallist: 4.0.0
     dev: true
+
+  /luxon/1.28.0:
+    resolution: {integrity: sha512-TfTiyvZhwBYM/7QdAVDh+7dBTBA29v4ik0Ce9zda3Mnf8on1S5KJI8P2jKFZ8+5C0jhmr0KwJEO/Wdpm0VeWJQ==}
+    dev: false
 
   /macos-release/2.5.0:
     resolution: {integrity: sha512-EIgv+QZ9r+814gjJj0Bt5vSLJLzswGmSUbUpbi9AIr/fsN2IWFBl2NucV9PAiek+U1STK468tEkxmVYUtuAN3g==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npm.taobao.org/macos-release/-/macos-release-2.5.0.tgz}
