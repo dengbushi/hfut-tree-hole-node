@@ -4,6 +4,9 @@ import { APP_GUARD } from '@nestjs/core'
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import { MongooseModule } from '@nestjs/mongoose'
 import { RedisModule } from '@liaoliaots/nestjs-redis'
+import { WinstonModule } from 'nest-winston'
+import { format } from 'winston'
+import * as DailyRotateFile from 'winston-daily-rotate-file'
 import { AuthModule } from '../modules/auth/auth.module'
 import { JwtAuthGuard } from '../modules/auth/guard/jwt.guard'
 import { RolesGuard } from '../modules/role/guard/role.guard'
@@ -25,6 +28,36 @@ import { FileService } from '../modules/file/file.service'
         port: 6379,
       },
     }, true),
+    WinstonModule.forRootAsync({
+      useFactory: () => {
+        const myFormat = format.printf(({ level, message, label, timestamp }) => {
+          return `${timestamp} [${level}]: ${message}`
+        })
+
+        return {
+          format: format.combine(
+            format.timestamp(),
+            myFormat,
+          ),
+          transports: [
+            new DailyRotateFile({
+              filename: 'logs/%DATE%.log',
+              datePattern: 'YYYY-MM-DD',
+              zippedArchive: true,
+              maxSize: '30m',
+              level: 'info',
+            }),
+            new DailyRotateFile({
+              filename: 'logs/%DATE%.error',
+              datePattern: 'YYYY-MM-DD',
+              zippedArchive: true,
+              maxSize: '30m',
+              level: 'error',
+            }),
+          ],
+        }
+      },
+    }),
     MongooseModule.forFeature([
       { name: Users.name, schema: UsersSchema },
       { name: Holes.name, schema: HolesSchema },
