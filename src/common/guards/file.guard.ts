@@ -22,7 +22,7 @@ export class FileGuard implements CanActivate {
       return true
     }
 
-    const redisKey = `file:${user.studentId}`
+    const redisKey = `file:upload:${user.studentId}`
     const times = parseInt(await this.redis.get(redisKey))
 
     if (!times) {

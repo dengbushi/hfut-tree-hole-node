@@ -12,6 +12,7 @@ import { UserDaoService } from '../../dao/user/user.service'
 import { RoleService } from '../role/role.service'
 import { FileService } from './file.service'
 import { FileController } from './file.controller'
+import { FileTaskService } from './fileTask.service'
 
 const storage = multer.diskStorage({
   destination(req, file, cb) {
@@ -45,6 +46,7 @@ const storage = multer.diskStorage({
     UserService,
     UserDaoService,
     RoleService,
+    FileTaskService,
   ],
   controllers: [FileController],
 })
