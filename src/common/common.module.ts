@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose'
 import { RedisModule } from '@liaoliaots/nestjs-redis'
 import { WinstonModule } from 'nest-winston'
 import { format } from 'winston'
+import * as winston from 'winston'
 import * as DailyRotateFile from 'winston-daily-rotate-file'
 import { AuthModule } from '../modules/auth/auth.module'
 import { JwtAuthGuard } from '../modules/auth/guard/jwt.guard'
@@ -40,6 +41,7 @@ import { LoggerInterceptor } from './interceptors/logger.interceptor'
           format: format.combine(
             format.timestamp(),
             myFormat,
+            format.colorize(),
           ),
           transports: [
             new DailyRotateFile({
@@ -53,6 +55,10 @@ import { LoggerInterceptor } from './interceptors/logger.interceptor'
               datePattern: 'YYYY-MM-DD',
               maxSize: '30m',
               level: 'error',
+            }),
+            new winston.transports.Stream({
+              stream: process.stderr,
+              level: 'debug',
             }),
           ],
         }
