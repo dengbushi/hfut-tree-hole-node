@@ -10,7 +10,7 @@ export class FileTaskService {
     private readonly redis: Redis,
   ) {}
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async removeFileUploadLimit() {
     const keys = await this.redis.keys('file:upload:*')
 

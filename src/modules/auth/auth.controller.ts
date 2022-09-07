@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Post, UseGuards } from '@nestjs/common'
+import { Body, Controller, Inject, NotFoundException, Post, UseGuards } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { Public } from '../../common/decorators/public.decorator'
 import { Roles } from '../../common/decorators/roles.decorator'
@@ -25,6 +25,7 @@ export class AuthController {
 
   @Post('/register')
   register(@Body() registerDataDto: RegisterDataDto) {
+    throw new NotFoundException('not found')
     return this.authService.register(registerDataDto)
   }
 

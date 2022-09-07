@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
-import { APP_GUARD } from '@nestjs/core'
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core'
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import { MongooseModule } from '@nestjs/mongoose'
 import { RedisModule } from '@liaoliaots/nestjs-redis'
@@ -14,6 +14,7 @@ import { Users, UsersSchema } from '../schema/user/user.schema'
 import { TreeholeDaoService } from '../dao/treehole/treehole-dao.service'
 import { Holes, HolesSchema } from '../schema/treehole/holes.schema'
 import { FileService } from '../modules/file/file.service'
+import { LoggerInterceptor } from './interceptors/logger.interceptor'
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { FileService } from '../modules/file/file.service'
         })
 
         return {
+          level: 'info',
           format: format.combine(
             format.timestamp(),
             myFormat,
@@ -43,14 +45,12 @@ import { FileService } from '../modules/file/file.service'
             new DailyRotateFile({
               filename: 'logs/%DATE%.log',
               datePattern: 'YYYY-MM-DD',
-              zippedArchive: true,
               maxSize: '30m',
               level: 'info',
             }),
             new DailyRotateFile({
               filename: 'logs/%DATE%.error',
               datePattern: 'YYYY-MM-DD',
-              zippedArchive: true,
               maxSize: '30m',
               level: 'error',
             }),
@@ -68,6 +68,7 @@ import { FileService } from '../modules/file/file.service'
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
+    { provide: APP_INTERCEPTOR, useClass: LoggerInterceptor },
     TreeholeDaoService,
     FileService,
   ],
