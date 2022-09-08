@@ -2,7 +2,6 @@ import { Body, Controller, Inject, Post, UseGuards } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { Public } from '../../common/decorators/public.decorator'
 import { Roles } from '../../common/decorators/roles.decorator'
-import { Role } from '../role/role.enum'
 import { AuthService } from './auth.service'
 import { LoginDataDto } from './dto/loginData.dto'
 import { LocalAuthGuard } from './guard/local-auth.guard'
@@ -12,7 +11,7 @@ import { ForgetDataDto } from './dto/forgetData.dto'
 @ApiTags('鉴权模块')
 @Public()
 @Controller('auth')
-@Roles([Role.Admin, Role.User])
+@Roles()
 export class AuthController {
   @Inject()
   private readonly authService: AuthService

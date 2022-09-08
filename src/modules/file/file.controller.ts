@@ -10,9 +10,11 @@ import {
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { FileGuard } from '../../common/guards/file.guard'
+import { Roles } from '../../common/decorators/roles.decorator'
 import { FileService } from './file.service'
 
 @Controller('file')
+@Roles()
 export class FileController {
   @Inject()
   private readonly fileService: FileService

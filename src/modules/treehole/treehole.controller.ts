@@ -2,7 +2,6 @@ import { Body, Controller, Delete, Get, Inject, Post, Query, Req } from '@nestjs
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { Request } from 'express'
 import { Roles } from '../../common/decorators/roles.decorator'
-import { Role } from '../role/role.enum'
 import { Police } from '../../common/guards/policies.guard'
 import { TreeholeDaoService } from '../../dao/treehole/treehole-dao.service'
 import { CheckPolicies } from '../../common/decorators/CheckPolicies.decorator'
@@ -22,7 +21,7 @@ import { DeleteHolePolicyHandler } from './policies/delete.police'
 @ApiTags('树洞模块')
 @ApiBearerAuth()
 @Police()
-@Roles([Role.Admin, Role.User])
+@Roles()
 @Controller('treehole')
 export class TreeholeController {
   @Inject()
@@ -47,6 +46,11 @@ export class TreeholeController {
   @Get('detail')
   async getDetail(@Query() dto: TreeholeDetailDto, @Req() req: Request) {
     return this.treeholeService.getDetail(dto, req.user)
+  }
+
+  @Post('reportHole')
+  async reportHole(@Body() dto: IsValidHoleIdDto) {
+    return this.treeholeService.reportHole(dto)
   }
 
   @Post('create')
