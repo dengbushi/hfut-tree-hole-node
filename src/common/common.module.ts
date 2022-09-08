@@ -33,7 +33,7 @@ import { LoggerInterceptor } from './interceptors/logger.interceptor'
     WinstonModule.forRootAsync({
       useFactory: () => {
         const myFormat = format.printf(({ level, message, label, timestamp }) => {
-          return `${timestamp} [${level}]: ${message}`
+          return `${timestamp} [${level.toUpperCase()}]: ${message}`
         })
 
         return {

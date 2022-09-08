@@ -14,14 +14,16 @@ export class LoggerInterceptor implements NestInterceptor {
     const now = Date.now()
     const request = context.switchToHttp().getRequest() as Request
 
+    const logBaseInfo = `[${context.getClass().name}]${context.getHandler().name}: ${request.user?.studentId || request.body?.studentId}`
+
     return next
       .handle()
       .pipe(
         tap(() => {
-          this.logger.log(`[${context.getClass().name}]${context.getHandler().name}: ${request.user.studentId || request.body.studentId} cost: ${Date.now() - now}ms`)
+          this.logger.log(`${logBaseInfo} cost: ${Date.now() - now}ms`)
         }),
         catchError((err) => {
-          this.logger.error(`[${context.getClass().name}]${context.getHandler().name}: ${request?.user?.studentId || request.body.studentId} ${err.stack} \ninputs: ${JSON.stringify(
+          this.logger.error(`${logBaseInfo} ${err.stack} \ninputs: ${JSON.stringify(
             isNotEmptyObject(request.params) ? request.params : request.body,
           )} cost: ${Date.now() - now}ms\n`)
           throw err
