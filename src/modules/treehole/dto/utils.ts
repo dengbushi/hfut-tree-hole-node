@@ -6,6 +6,8 @@ import { BadRequestException, Inject, Injectable, NotFoundException } from '@nes
 import { InjectModel } from '@nestjs/mongoose'
 import mongoose, { Model } from 'mongoose'
 import { ApiProperty } from '@nestjs/swagger'
+import { InjectRedis } from '@liaoliaots/nestjs-redis'
+import Redis from 'ioredis'
 import { TreeholeMode } from '../../../schema/treehole/treeholeMode.schema'
 import { TreeholeDaoService } from '../../../dao/treehole/treehole-dao.service'
 import { Holes, HolesDocument } from '../../../schema/treehole/holes.schema'
@@ -72,6 +74,12 @@ export function IsValidId(validationOptions?: ValidationOptions) {
 export class ValidateHoleId implements ValidatorConstraintInterface {
   @InjectModel(Holes.name)
   private readonly holesModel: Model<HolesDocument>
+
+  constructor(
+    @InjectRedis()
+    private readonly redis: Redis,
+  ) {
+  }
 
   async validate(id: unknown, args: ValidationArguments) {
     if (isNaN(id as number)) {

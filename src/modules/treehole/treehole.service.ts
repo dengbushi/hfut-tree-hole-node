@@ -8,6 +8,8 @@ import {
 import { InjectModel } from '@nestjs/mongoose'
 import mongoose, { Model } from 'mongoose'
 import type { HoleDetailDocument } from 'src/schema/treehole/holeDetail.schema'
+import { InjectRedis } from '@liaoliaots/nestjs-redis'
+import Redis from 'ioredis'
 import { createResponse } from '../../shared/utils/create'
 import { Holes, HolesDocument } from '../../schema/treehole/holes.schema'
 import { TreeholeDaoService } from '../../dao/treehole/treehole-dao.service'
@@ -38,6 +40,11 @@ export class TreeholeService {
 
   @Inject()
   private readonly caslFacotry: CaslAbilityFactory
+
+  constructor(
+    @InjectRedis()
+    private readonly redis: Redis,
+  ) {}
 
   async getList(dto: TreeholeListDto, user: IUser) {
     const holes = await this.treeholeDaoService.getList(dto, user.studentId)
@@ -81,6 +88,12 @@ export class TreeholeService {
     } catch (err) {
       throw new InternalServerErrorException('删除树洞失败')
     }
+  }
+
+  async reportHole(dto: IsValidHoleIdDto) {
+    this.holesModel.updateOne({ id: dto.id }, {
+      $set: {},
+    })
   }
 
   async createComment(dto: CreateCommentDto, user: IUser) {
