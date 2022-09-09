@@ -5,8 +5,8 @@ import { BaseSchema } from '../../common/decorators/BaseSchema.decorator'
 export type ReportDocument = Report & Document
 
 export const enum ReportTypes {
-  HOLE = '树洞',
-  COMMENT = '评论',
+  HOLE = 'HOLE',
+  COMMENT = 'COMMENT',
 }
 
 class ReportItem {

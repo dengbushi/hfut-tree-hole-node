@@ -31,7 +31,7 @@ export class ReportController {
   }
 
   @Patch('comment')
-  async patchComment(@Req() req: Request, @Body() dto: ReportHoleDto) {
+  async patchComment(@Req() req: Request, @Body() dto: ReportCommentDto) {
     return this.reportService.patch(dto, req.user, CommentDtoCacheKey)
   }
 }

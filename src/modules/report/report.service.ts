@@ -25,13 +25,13 @@ export class ReportService {
   private readonly treeholeDaoService: TreeholeDaoService
 
   async report(dto: ReportHoleDto | ReportCommentDto, user: IUser, key: string) {
-    const { isReportExist, id } = await this.preloadData(dto, user, key)
+    const { isReportExist, id, type } = await this.preloadData(dto, user, key)
 
     if (isReportExist) {
       if (!isReportExist.reportUsers.some(item => item.id === user.studentId)) {
         await this.reportModel.updateOne({
           id,
-          type: ReportTypes.HOLE,
+          type,
         },
         { $push: { reportUsers: { id: user.studentId, msg: dto.msg } } },
         )
@@ -39,7 +39,7 @@ export class ReportService {
         throw new BadRequestException('你已经举报过啦')
       }
     } else {
-      const report = await this.reportModel.create({ id, type: ReportTypes.HOLE, reportUsers: [{ id: user.studentId, msg: dto.msg }] })
+      const report = await this.reportModel.create({ id, type, reportUsers: [{ id: user.studentId, msg: dto.msg }] })
       report.save()
     }
 
@@ -57,7 +57,7 @@ export class ReportService {
 
     const report = isReportExist.reportUsers.find(item => item.id === user.studentId)
 
-    if (report.id !== user.studentId) {
+    if (report?.id !== user.studentId) {
       throw new BadRequestException('你不能修改其他人的举报')
     }
 
