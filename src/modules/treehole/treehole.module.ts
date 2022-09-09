@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { CacheModule, Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
 import { TreeholeMode, TreeholeModeSchema } from '../../schema/treehole/treeholeMode.schema'
 import { Holes, HolesSchema } from '../../schema/treehole/holes.schema'
@@ -13,7 +13,9 @@ import { UserDaoService } from '../../dao/user/user.service'
 import { TreeholeController } from './treehole.controller'
 import { TreeholeService } from './treehole.service'
 import { ModeService } from './mode.service'
-import { IsModeExist, ValidateHoleId, ValidateId } from './dto/utils'
+import { ValidateHoleId, ValidateId } from './dto/utils'
+import { ValidateCommentId } from './dto/comment.dto'
+import { IsModeExist } from './dto/mode.dto'
 
 @Module({
   imports: [
@@ -23,6 +25,7 @@ import { IsModeExist, ValidateHoleId, ValidateId } from './dto/utils'
       { name: Users.name, schema: UsersSchema },
       { name: HoleDetail.name, schema: HoleDetailSchema },
     ]),
+    CacheModule.register(),
     RoleModule,
   ],
   controllers: [TreeholeController],
@@ -31,6 +34,7 @@ import { IsModeExist, ValidateHoleId, ValidateId } from './dto/utils'
     IsModeExist,
     ValidateId,
     ValidateHoleId,
+    ValidateCommentId,
     TreeholeDaoService,
     ModeService,
     CaslAbilityFactory,

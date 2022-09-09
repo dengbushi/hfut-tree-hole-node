@@ -1,9 +1,14 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, CACHE_MANAGER, Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
-import { IsValidHoleIdDto } from '../treehole/dto/utils'
+import Mongoose, { Model } from 'mongoose'
+import { Cache } from 'cache-manager'
 import { Report, ReportDocument, ReportTypes } from '../../schema/report/report.schema'
 import { Holes, HolesDocument } from '../../schema/treehole/holes.schema'
+import { createResponse } from '../../shared/utils/create'
+import { IUser } from '../../env'
+import { TreeholeDaoService } from '../../dao/treehole/treehole-dao.service'
+import { CommentDtoCacheKey, ValidateHoleCacheKey } from '../../shared/constant/cacheKeys'
+import { ReportCommentDto, ReportHoleDto } from './dto/report.dto'
 
 @Injectable()
 export class ReportService {
@@ -11,13 +16,85 @@ export class ReportService {
   private readonly reportModel: Model<ReportDocument>
 
   @InjectModel(Holes.name)
-  private readonly HolesModel: Model<HolesDocument>
+  private readonly holesModel: Model<HolesDocument>
 
-  async reportHole(dto: IsValidHoleIdDto) {
-    // TODO get the hole data from the redis which will be processed
+  @Inject(CACHE_MANAGER)
+  private cacheManager: Cache
 
-    const isExist = await this.reportModel.findOne({ id: dto.id, type: ReportTypes.HOLE })
+  @Inject()
+  private readonly treeholeDaoService: TreeholeDaoService
 
-    console.log(isExist)
+  async report(dto: ReportHoleDto | ReportCommentDto, user: IUser, key: string) {
+    const { isReportExist, id } = await this.preloadData(dto, user, key)
+
+    if (isReportExist) {
+      if (!isReportExist.reportUsers.some(item => item.id === user.studentId)) {
+        await this.reportModel.updateOne({
+          id,
+          type: ReportTypes.HOLE,
+        },
+        { $push: { reportUsers: { id: user.studentId, msg: dto.msg } } },
+        )
+      } else {
+        throw new BadRequestException('你已经举报过啦')
+      }
+    } else {
+      const report = await this.reportModel.create({ id, type: ReportTypes.HOLE, reportUsers: [{ id: user.studentId, msg: dto.msg }] })
+      report.save()
+    }
+
+    await this.cacheManager.del(ValidateHoleCacheKey)
+
+    return createResponse('举报成功')
+  }
+
+  async patch(dto: ReportHoleDto | ReportCommentDto, user: IUser, key: string) {
+    const { isReportExist, id } = await this.preloadData(dto, user, key)
+
+    if (!isReportExist) {
+      throw new NotFoundException('该举报不存在')
+    }
+
+    const report = isReportExist.reportUsers.find(item => item.id === user.studentId)
+
+    if (report.id !== user.studentId) {
+      throw new BadRequestException('你不能修改其他人的举报')
+    }
+
+    await this.reportModel.updateOne({
+      id,
+      reportUsers: {
+        $elemMatch: { id: user.studentId },
+      },
+    },
+    { $set: { 'reportUsers.$.msg': dto.msg } })
+
+    await this.cacheManager.del(ValidateHoleCacheKey)
+
+    return createResponse('修改举报评论成功')
+  }
+
+  async preloadData(dto: ReportHoleDto | ReportCommentDto, user: IUser, key: string) {
+    const cache = await this.cacheManager.get(key) as any
+    const id = cache._id as Mongoose.Types.ObjectId
+
+    let type: ReportTypes
+
+    switch (key) {
+      case ValidateHoleCacheKey:
+        type = ReportTypes.HOLE
+        break
+      case CommentDtoCacheKey:
+        type = ReportTypes.COMMENT
+        break
+    }
+
+    const isReportExist = await this.reportModel.findOne({ id })
+
+    return {
+      id,
+      type,
+      isReportExist,
+    }
   }
 }

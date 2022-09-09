@@ -20,6 +20,7 @@ import databaseConfig from './config/database.config'
       imports: [ConfigModule],
       useFactory: (config: ConfigService): MongooseModuleFactoryOptions => ({
         uri: config.get('DATABASE_URL'),
+        enableUtf8Validation: true,
       }),
       inject: [ConfigService],
     }),

@@ -40,9 +40,12 @@ export class PoliciesGuard implements CanActivate {
     }
 
     return policyHandlers.every(async(handler) => {
+      // eslint-disable-next-line no-useless-catch
       try {
         return await this.execPolicyHandler(handler, ability, req, models)
-      } catch (err) {}
+      } catch (err) {
+        throw err
+      }
     })
   }
 

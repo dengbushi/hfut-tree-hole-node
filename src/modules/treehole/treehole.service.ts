@@ -58,7 +58,6 @@ export class TreeholeService {
 
       return createResponse('获取树洞详情成功', res)
     } catch (err) {
-      console.log(err)
       throw new InternalServerErrorException('获取树洞详情失败')
     }
   }

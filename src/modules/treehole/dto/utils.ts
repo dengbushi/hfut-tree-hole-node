@@ -2,43 +2,16 @@ import {
   IsNumber,
   ValidationArguments, ValidationOptions, ValidatorConstraint, ValidatorConstraintInterface, registerDecorator,
 } from 'class-validator'
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestException, CACHE_MANAGER, Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import mongoose, { Model } from 'mongoose'
 import { ApiProperty } from '@nestjs/swagger'
 import { InjectRedis } from '@liaoliaots/nestjs-redis'
 import Redis from 'ioredis'
-import { TreeholeMode } from '../../../schema/treehole/treeholeMode.schema'
+import { Cache } from 'cache-manager'
 import { TreeholeDaoService } from '../../../dao/treehole/treehole-dao.service'
 import { Holes, HolesDocument } from '../../../schema/treehole/holes.schema'
-
-@ValidatorConstraint({ async: true })
-@Injectable()
-export class IsModeExist implements ValidatorConstraintInterface {
-  constructor(
-    @InjectModel(TreeholeMode.name)
-    private readonly treeholeModeModel: Model<TreeholeMode>,
-  ) {
-  }
-
-  async validate(mode: any, args: ValidationArguments) {
-    const res = (await this.treeholeModeModel.findOne()).modes
-
-    return !!res.map(item => item.value).includes(mode)
-  }
-}
-
-export function IsTreeholeMode(validationOptions?: ValidationOptions) {
-  return function(object: Object, propertyName: string) {
-    registerDecorator({
-      target: object.constructor,
-      propertyName,
-      options: validationOptions,
-      constraints: [],
-      validator: IsModeExist,
-    })
-  }
-}
+import { ValidateHoleCacheKey } from '../../../shared/constant/cacheKeys'
 
 @ValidatorConstraint({ async: true })
 @Injectable()
@@ -75,6 +48,9 @@ export class ValidateHoleId implements ValidatorConstraintInterface {
   @InjectModel(Holes.name)
   private readonly holesModel: Model<HolesDocument>
 
+  @Inject(CACHE_MANAGER)
+  private cacheManager: Cache
+
   constructor(
     @InjectRedis()
     private readonly redis: Redis,
@@ -86,6 +62,8 @@ export class ValidateHoleId implements ValidatorConstraintInterface {
       throw new BadRequestException('id格式错误')
     }
     const isHoleExist = await this.holesModel.findOne({ id })
+
+    await this.cacheManager.set(ValidateHoleCacheKey, isHoleExist)
 
     if (!isHoleExist) {
       throw new NotFoundException('没有找到这个树洞哦~')

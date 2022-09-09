@@ -2,9 +2,9 @@ import { Body, Controller, Delete, Get, Inject, Post, Query, Req } from '@nestjs
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { Request } from 'express'
 import { Roles } from '../../common/decorators/roles.decorator'
-import { Police } from '../../common/guards/policies.guard'
 import { TreeholeDaoService } from '../../dao/treehole/treehole-dao.service'
 import { CheckPolicies } from '../../common/decorators/CheckPolicies.decorator'
+import { DeleteHolePolicyHandler } from './policies/delete.police'
 import { TreeholeService } from './treehole.service'
 import {
   CreateCommentDto,
@@ -16,11 +16,9 @@ import {
 } from './dto/treehole.dto'
 import { ModeService } from './mode.service'
 import { IsValidHoleIdDto } from './dto/utils'
-import { DeleteHolePolicyHandler } from './policies/delete.police'
 
 @ApiTags('树洞模块')
 @ApiBearerAuth()
-@Police()
 @Roles()
 @Controller('treehole')
 export class TreeholeController {
