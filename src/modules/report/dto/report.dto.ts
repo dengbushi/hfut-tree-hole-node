@@ -7,10 +7,10 @@ export class ReportCommentDto {
   @IsValidId()
     id: string
 
-  @IsString()
   @MaxLength(200, {
     message: '最多只能填写200字哦',
   })
+  @IsString()
     msg: string
 }
 

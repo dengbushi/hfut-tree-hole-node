@@ -12,6 +12,7 @@ import { RoleModule } from './modules/role/role.module'
 import { CaslModule } from './modules/casl/casl.module'
 import { FileModule } from './modules/file/file.module'
 import { ReportModule } from './modules/report/report.module'
+import { MessageWallModule } from './modules/message-wall/message-wall.module'
 import databaseConfig from './config/database.config'
 
 @Module({
@@ -38,6 +39,7 @@ import databaseConfig from './config/database.config'
     CaslModule,
     FileModule,
     ReportModule,
+    MessageWallModule,
   ],
   controllers: [],
 })

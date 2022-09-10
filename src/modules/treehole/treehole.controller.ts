@@ -16,6 +16,7 @@ import {
 } from './dto/treehole.dto'
 import { ModeService } from './mode.service'
 import { IsValidHoleIdDto } from './dto/utils'
+import { HoleSearchDto } from './dto/search.dto'
 
 @ApiTags('树洞模块')
 @ApiBearerAuth()
@@ -44,6 +45,11 @@ export class TreeholeController {
   @Get('detail')
   async getDetail(@Query() dto: TreeholeDetailDto, @Req() req: Request) {
     return this.treeholeService.getDetail(dto, req.user)
+  }
+
+  @Get('search')
+  async searchHole(@Query() dto: HoleSearchDto) {
+    return this.treeholeService.search(dto)
   }
 
   @Post('reportHole')

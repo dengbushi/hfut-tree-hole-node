@@ -26,6 +26,7 @@ import {
   TreeholeListDto,
 } from './dto/treehole.dto'
 import { IsValidHoleIdDto } from './dto/utils'
+import { HoleSearchDto } from './dto/search.dto'
 
 @Injectable()
 export class TreeholeService {
@@ -49,7 +50,7 @@ export class TreeholeService {
   async getList(dto: TreeholeListDto, user: IUser) {
     const holes = await this.treeholeDaoService.getList(dto, user.studentId)
 
-    return createResponse('获取树洞列表成功', holes)
+    return createResponse('获取树洞列表成功', { data: holes })
   }
 
   async getDetail(dto: TreeholeDetailDto, user: IUser) {
@@ -189,4 +190,6 @@ export class TreeholeService {
       throw new InternalServerErrorException('star删除失败')
     }
   }
+
+  async search(dto: HoleSearchDto) {}
 }

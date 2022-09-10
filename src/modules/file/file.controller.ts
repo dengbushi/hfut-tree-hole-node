@@ -1,5 +1,5 @@
 import {
-  Controller,
+  Controller, Get,
   HttpStatus,
   Inject,
   ParseFilePipeBuilder,
@@ -36,5 +36,10 @@ export class FileController {
         }),
     ) file: Express.Multer.File) {
     return this.fileService.test()
+  }
+
+  @Get('/sts')
+  generateSecretKey() {
+
   }
 }
