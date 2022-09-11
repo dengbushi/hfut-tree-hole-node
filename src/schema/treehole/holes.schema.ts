@@ -43,7 +43,7 @@ export class Holes {
   @Prop({ type: [String] })
     imgs: string[]
 
-  @Prop({ type: [{ type: Object }] })
+  @Prop({ type: [{ type: Object, ref: () => Comment }] })
     comments: Comment[]
 
   constructor(props: { userId: number }) {

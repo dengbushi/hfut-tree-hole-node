@@ -90,12 +90,6 @@ export class TreeholeService {
     }
   }
 
-  async reportHole(dto: IsValidHoleIdDto) {
-    this.holesModel.updateOne({ id: dto.id }, {
-      $set: {},
-    })
-  }
-
   async createComment(dto: CreateCommentDto, user: IUser) {
     try {
       const id = new mongoose.Types.ObjectId()

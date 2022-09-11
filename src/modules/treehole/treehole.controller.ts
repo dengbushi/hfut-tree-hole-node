@@ -52,11 +52,6 @@ export class TreeholeController {
     return this.treeholeService.search(dto)
   }
 
-  @Post('reportHole')
-  async reportHole(@Body() dto: IsValidHoleIdDto) {
-    return this.treeholeService.reportHole(dto)
-  }
-
   @Post('create')
   async createHole(
     @Body() dto: CreateHoleDto,

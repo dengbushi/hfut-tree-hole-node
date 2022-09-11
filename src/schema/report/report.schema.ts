@@ -4,7 +4,7 @@ import { BaseSchema } from '../../common/decorators/BaseSchema.decorator'
 
 export type ReportDocument = Report & Document
 
-export const enum ReportTypes {
+export enum ReportTypes {
   HOLE = 'HOLE',
   COMMENT = 'COMMENT',
 }
@@ -16,7 +16,7 @@ class ReportItem {
 
 @BaseSchema()
 export class Report {
-  @Prop({ type: String, index: 1, enum: [ReportTypes.COMMENT, ReportTypes.HOLE] })
+  @Prop({ type: String, index: 1, enum: ReportTypes })
     type: ReportTypes
 
   @Prop({ type: Mongoose.Schema.Types.ObjectId, index: 0 })

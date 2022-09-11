@@ -1,15 +1,15 @@
 import mongoose, { Model } from 'mongoose'
 import {
   IsString,
-  ValidationOptions,
   ValidatorConstraint,
-  ValidatorConstraintInterface, registerDecorator,
+  ValidatorConstraintInterface,
 } from 'class-validator'
 import { CACHE_MANAGER, Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Cache } from 'cache-manager'
 import { Holes, HolesDocument } from '../../../schema/treehole/holes.schema'
 import { CommentDtoCacheKey } from '../../../shared/constant/cacheKeys'
+import { createClassValidator } from '../../../shared/utils/create'
 
 @ValidatorConstraint({ async: true })
 @Injectable()
@@ -39,17 +39,7 @@ export class ValidateCommentId implements ValidatorConstraintInterface {
   }
 }
 
-export function IsValidCommentId(validationOptions?: ValidationOptions) {
-  return function(object: Object, propertyName: string) {
-    registerDecorator({
-      target: object.constructor,
-      propertyName,
-      options: validationOptions,
-      constraints: [],
-      validator: ValidateCommentId,
-    })
-  }
-}
+export const IsValidCommentId = createClassValidator(ValidateCommentId)
 
 export class IsValidCommentIdDto {
   @IsValidCommentId()

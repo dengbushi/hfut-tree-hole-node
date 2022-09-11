@@ -1,14 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger'
 import {
   IsNumber, ValidationArguments,
-  ValidationOptions,
   ValidatorConstraint,
   ValidatorConstraintInterface,
-  registerDecorator,
 } from 'class-validator'
 import { Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { NumberLength } from '../../../common/decorators/NumberLength.decorator'
 import { UserService } from '../../user/user.service'
+import { createClassValidator } from '../../../shared/utils/create'
 
 @ValidatorConstraint({ async: true })
 @Injectable()
@@ -27,17 +26,7 @@ export class ValidateStudentExistId implements ValidatorConstraintInterface {
   }
 }
 
-export function IsValidStudentId(validationOptions?: ValidationOptions) {
-  return function(object: Object, propertyName: string) {
-    registerDecorator({
-      target: object.constructor,
-      propertyName,
-      options: validationOptions,
-      constraints: [],
-      validator: ValidateStudentExistId,
-    })
-  }
-}
+export const IsValidStudentId = createClassValidator(ValidateStudentExistId)
 
 export class StudentIdDataDto {
   @ApiProperty({

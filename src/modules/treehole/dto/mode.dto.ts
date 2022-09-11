@@ -1,14 +1,13 @@
 import {
   ValidationArguments,
-  ValidationOptions,
   ValidatorConstraint,
   ValidatorConstraintInterface,
-  registerDecorator,
 } from 'class-validator'
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { TreeholeMode } from '../../../schema/treehole/treeholeMode.schema'
+import { createClassValidator } from '../../../shared/utils/create'
 
 @ValidatorConstraint({ async: true })
 @Injectable()
@@ -26,14 +25,4 @@ export class IsModeExist implements ValidatorConstraintInterface {
   }
 }
 
-export function IsTreeholeMode(validationOptions?: ValidationOptions) {
-  return function(object: Object, propertyName: string) {
-    registerDecorator({
-      target: object.constructor,
-      propertyName,
-      options: validationOptions,
-      constraints: [],
-      validator: IsModeExist,
-    })
-  }
-}
+export const IsTreeholeMode = createClassValidator(IsModeExist)

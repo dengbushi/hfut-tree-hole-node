@@ -12,6 +12,7 @@ import { Cache } from 'cache-manager'
 import { TreeholeDaoService } from '../../../dao/treehole/treehole-dao.service'
 import { Holes, HolesDocument } from '../../../schema/treehole/holes.schema'
 import { ValidateHoleCacheKey } from '../../../shared/constant/cacheKeys'
+import { createClassValidator } from '../../../shared/utils/create'
 
 @ValidatorConstraint({ async: true })
 @Injectable()
@@ -73,17 +74,7 @@ export class ValidateHoleId implements ValidatorConstraintInterface {
   }
 }
 
-export function IsValidHoleId(validationOptions?: ValidationOptions) {
-  return function(object: Object, propertyName: string) {
-    registerDecorator({
-      target: object.constructor,
-      propertyName,
-      options: validationOptions,
-      constraints: [],
-      validator: ValidateHoleId,
-    })
-  }
-}
+export const IsValidHoleId = createClassValidator(ValidateHoleId)
 
 export class IsValidHoleIdDto {
   @ApiProperty({ type: Number, description: '树洞id' })
