@@ -79,13 +79,10 @@ export class TreeholeService {
   }
 
   async removeHole(dto: IsValidHoleIdDto, user: IUser) {
-    try {
-      await this.holesModel.updateOne({ id: dto.id }, { delete: true })
+    // 不删除树洞，改变状态以达到删除效果
+    await this.holesModel.updateOne({ id: dto.id }, { delete: true })
 
-      return createResponse('删除成功')
-    } catch (err) {
-      throw new InternalServerErrorException('删除树洞失败')
-    }
+    return createResponse('删除成功')
   }
 
   async createComment(dto: CreateCommentDto, user: IUser) {
