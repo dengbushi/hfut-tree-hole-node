@@ -24,6 +24,7 @@ export class ValidateCommentId implements ValidatorConstraintInterface {
     const commentId = new mongoose.Types.ObjectId(id)
 
     const isCommentExist = await this.holesModel.findOne({
+      delete: false,
       comments: {
         $elemMatch: { _id: commentId },
       },

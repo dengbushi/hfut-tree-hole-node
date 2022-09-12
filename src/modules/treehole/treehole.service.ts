@@ -64,25 +64,23 @@ export class TreeholeService {
   }
 
   async createHole(dto: CreateHoleDto, user: IUser) {
-    const holeList = await this.holesModel.find({})
+    const lastHole = (await this.holesModel.find().sort({ id: -1 }))[0]
 
-    try {
-      const hole = await new this.holesModel({
-        userId: user.studentId,
-        ...dto,
-        id: holeList.length + 1,
-        stars: Number(Math.random() * 1000).toFixed(0),
-      }).save()
+    const id = lastHole ? lastHole.id + 1 : 0
 
-      return createResponse('创建树洞成功', { id: hole.id })
-    } catch (err) {
-      throw new InternalServerErrorException('创建树洞失败')
-    }
+    const hole = await new this.holesModel({
+      userId: user.studentId,
+      ...dto,
+      id,
+      stars: Number(Math.random() * 1000).toFixed(0),
+    }).save()
+
+    return createResponse('创建树洞成功', { id: hole.id })
   }
 
   async removeHole(dto: IsValidHoleIdDto, user: IUser) {
     try {
-      await this.holesModel.deleteOne({ id: dto.id })
+      await this.holesModel.updateOne({ id: dto.id }, { delete: true })
 
       return createResponse('删除成功')
     } catch (err) {

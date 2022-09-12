@@ -46,6 +46,9 @@ export class Holes {
   @Prop({ type: [{ type: Object, ref: () => Comment }] })
     comments: Comment[]
 
+  @Prop({ type: Boolean, index: 1, default: false })
+    delete: boolean
+
   constructor(props: { userId: number }) {
     Object.assign(this, props)
   }

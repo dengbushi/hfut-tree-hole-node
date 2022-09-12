@@ -62,7 +62,7 @@ export class ValidateHoleId implements ValidatorConstraintInterface {
     if (isNaN(id as number)) {
       throw new BadRequestException('id格式错误')
     }
-    const isHoleExist = await this.holesModel.findOne({ id })
+    const isHoleExist = await this.holesModel.findOne({ id, delete: false })
 
     await this.cacheManager.set(ValidateHoleCacheKey, isHoleExist)
 

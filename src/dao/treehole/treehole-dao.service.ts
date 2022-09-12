@@ -30,6 +30,11 @@ export class TreeholeDaoService {
         $unwind: '$user',
       },
       {
+        $match: {
+          delete: false,
+        },
+      },
+      {
         $addFields: {
           comments: {
             $mergeObjects: {
@@ -55,6 +60,7 @@ export class TreeholeDaoService {
         $project: {
           _id: 0,
           userId: 0,
+          delete: 0,
           user: {
             _id: 0,
             studentId: 0,
@@ -123,6 +129,7 @@ export class TreeholeDaoService {
     const pipeLineStage: PipelineStage[] = [{
       $match: {
         id,
+        delete: false,
       },
     }, {
       $lookup: {
@@ -152,6 +159,7 @@ export class TreeholeDaoService {
       $project: {
         userId: 0,
         _id: 0,
+        delete: false,
         user: {
           _id: 0,
           password: 0,
