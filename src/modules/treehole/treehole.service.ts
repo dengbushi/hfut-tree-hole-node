@@ -78,7 +78,7 @@ export class TreeholeService {
     return createResponse('创建树洞成功', { id: hole.id })
   }
 
-  async removeHole(dto: IsValidHoleIdDto, user: IUser) {
+  async removeHole(dto: IsValidHoleIdDto) {
     // 不删除树洞，改变状态以达到删除效果
     await this.holesModel.updateOne({ id: dto.id }, { delete: true })
 
