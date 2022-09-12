@@ -66,7 +66,7 @@ export class TreeholeController {
     @Body() dto: IsValidHoleIdDto,
     @Req() req: Request,
   ) {
-    return this.treeholeService.removeHole(dto, req.user)
+    return this.treeholeService.removeHole(dto)
   }
 
   @Post('comment')
