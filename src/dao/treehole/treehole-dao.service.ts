@@ -14,7 +14,7 @@ export class TreeholeDaoService {
 
   async getList(dto: TreeholeListDto, userId: number) {
     const sort: PipelineStage = {
-      $sort: { stars: -1, createTime: -1 },
+      $sort: { id: 1 },
     }
 
     const pipeLineStage: PipelineStage[] = [
