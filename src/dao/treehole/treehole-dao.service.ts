@@ -17,6 +17,8 @@ export class TreeholeDaoService {
       $sort: { id: 1 },
     }
 
+    const skip = (dto.page - 1) * dto.limit
+
     const pipeLineStage: PipelineStage[] = [
       {
         $lookup: {
@@ -73,13 +75,6 @@ export class TreeholeDaoService {
           updatedTime: 0,
         },
       },
-      sort,
-      {
-        $skip: dto.skip,
-      },
-      {
-        $limit: dto.limit,
-      },
     ]
 
     const mode = dto.mode
@@ -98,9 +93,11 @@ export class TreeholeDaoService {
     }
 
     try {
-      const queryRes = await this.holesModel.aggregate(pipeLineStage) as ITreeholeListPipeLineStage[]
+      const queryRes = await this.holesModel.aggregate([...pipeLineStage, ...[{ $skip: skip }, { $limit: dto.limit }]]) as ITreeholeListPipeLineStage[]
 
-      return queryRes.map((item) => {
+      const pageRes = await this.holesModel.aggregate(pipeLineStage)
+
+      const data = queryRes.map((item) => {
         item.comments.data = item.comments.data.map((commentItem) => {
           const user = item.comments_user.find(userItem => userItem.studentId)!
 
@@ -120,6 +117,15 @@ export class TreeholeDaoService {
 
         return item
       })
+
+      const pageSize = Math.ceil(pageRes.length / dto.limit)
+
+      return {
+        data,
+        pageSize,
+        nextPage: Math.min(dto.page + 1, pageSize),
+        hasNextPage: dto.page !== pageSize,
+      }
     } catch (err) {
       throw new InternalServerErrorException('获取树洞列表失败')
     }

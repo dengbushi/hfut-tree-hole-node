@@ -3,7 +3,7 @@ import { IsNotEmpty, IsNumber } from 'class-validator'
 export class PaginationDto {
   @IsNotEmpty()
   @IsNumber()
-    skip: number
+    page: number
 
   @IsNotEmpty()
   @IsNumber()

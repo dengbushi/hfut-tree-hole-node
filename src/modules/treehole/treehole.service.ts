@@ -50,7 +50,7 @@ export class TreeholeService {
   async getList(dto: TreeholeListDto, user: IUser) {
     const holes = await this.treeholeDaoService.getList(dto, user.studentId)
 
-    return createResponse('获取树洞列表成功', { data: holes })
+    return createResponse('获取树洞列表成功', holes)
   }
 
   async getDetail(dto: TreeholeDetailDto, user: IUser) {
