@@ -1,10 +1,10 @@
 import { Body, Controller, Get, Inject, Post, Query, Req } from '@nestjs/common'
 import { Request } from 'express'
-import { Roles } from '../../common/decorators/roles.decorator'
 import { MessageWallService } from './message-wall.service'
 import { MessageWallTagsService } from './tags.service'
 import { PostMessageDto } from './dto/postMessage.dto'
 import { GetWallDto } from './dto/getWall.dto'
+import { Roles } from '@/common/decorators/roles.decorator'
 
 @Roles()
 @Controller('messageWall')

@@ -73,6 +73,7 @@ export class TreeholeService {
       ...dto,
       id,
       stars: Number(Math.random() * 1000).toFixed(0),
+      options: dto.options ? dto.options.map(item => ({ option: item, voteNum: 0 })) : [],
     }).save()
 
     return createResponse('创建树洞成功', { id: hole.id })

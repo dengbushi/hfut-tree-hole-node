@@ -1,12 +1,18 @@
 import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  ArrayUnique,
+  IsMongoId,
   IsNotEmpty,
+  IsOptional,
   IsString,
   MaxLength,
 } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 import { PaginationDto } from '../../../common/dto/pagination.schema'
 import { TreeholeConst } from '../../../shared/constant/treehole'
-import { IsValidHoleIdDto, IsValidId } from './utils'
+import { Validate } from '../../../shared/utils/dto'
+import { IsValidHoleIdDto } from './utils'
 import { IsTreeholeMode } from './mode.dto'
 
 export class TreeholeListDto extends PaginationDto {
@@ -29,6 +35,30 @@ export class CreateHoleDto {
     message: `树洞正文字数不能超过${TreeholeConst.maxContentLength}`,
   })
     content: string
+
+  @ApiProperty({ type: String, description: '选项' })
+  @ArrayMaxSize(5, {
+    message: '选项最多只能有5项',
+  })
+  @ArrayMinSize(2, {
+    message: '至少要有2项选择',
+  })
+  @Validate<string[]>(
+    (val) => {
+      for (const item of val) {
+        if (item.length > 20) {
+          return false
+        }
+      }
+
+      return true
+    },
+    {
+      message: '每项选项最长只能为20字哦',
+    },
+  )
+  @IsOptional()
+    options?: string[]
 }
 
 export class CreateCommentDto extends IsValidHoleIdDto {
@@ -47,6 +77,6 @@ export class RemoveHoleCommentDto extends IsValidHoleIdDto {
   @ApiProperty({ type: String, description: '留言id' })
   @IsString()
   @IsNotEmpty()
-  @IsValidId()
+  @IsMongoId()
     commentId: string
 }

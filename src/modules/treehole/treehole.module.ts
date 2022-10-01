@@ -13,7 +13,7 @@ import { UserDaoService } from '../../dao/user/user.service'
 import { TreeholeController } from './treehole.controller'
 import { TreeholeService } from './treehole.service'
 import { ModeService } from './mode.service'
-import { ValidateHoleId, ValidateId } from './dto/utils'
+import { ValidateHoleId } from './dto/utils'
 import { ValidateCommentId } from './dto/comment.dto'
 import { IsModeExist } from './dto/mode.dto'
 
@@ -32,7 +32,6 @@ import { IsModeExist } from './dto/mode.dto'
   providers: [
     TreeholeService,
     IsModeExist,
-    ValidateId,
     ValidateHoleId,
     ValidateCommentId,
     TreeholeDaoService,

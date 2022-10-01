@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
-import { MessageWall, MessageWallDocument } from '../../schema/message-wall/message-wall.schema'
-import { IUser } from '../../env'
-import { createResponse } from '../../shared/utils/create'
 import { PostMessageDto } from './dto/postMessage.dto'
 import { GetWallDto } from './dto/getWall.dto'
+import { MessageWall, MessageWallDocument } from '@/schema/message-wall/message-wall.schema'
+import { IUser } from '@/env'
+import { createResponse } from '@/shared/utils/create'
 
 @Injectable()
 export class MessageWallService {

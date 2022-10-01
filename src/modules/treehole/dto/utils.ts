@@ -16,35 +16,6 @@ import { createClassValidator } from '../../../shared/utils/create'
 
 @ValidatorConstraint({ async: true })
 @Injectable()
-export class ValidateId implements ValidatorConstraintInterface {
-  @Inject()
-  private readonly treeholeDaoService: TreeholeDaoService
-
-  async validate(id: string, args: ValidationArguments) {
-    const isValid = mongoose.isObjectIdOrHexString(id)
-
-    if (!isValid) {
-      throw new BadRequestException('id格式错误')
-    }
-
-    return true
-  }
-}
-
-export function IsValidId(validationOptions?: ValidationOptions) {
-  return function(object: Object, propertyName: string) {
-    registerDecorator({
-      target: object.constructor,
-      propertyName,
-      options: validationOptions,
-      constraints: [],
-      validator: ValidateId,
-    })
-  }
-}
-
-@ValidatorConstraint({ async: true })
-@Injectable()
 export class ValidateHoleId implements ValidatorConstraintInterface {
   @InjectModel(Holes.name)
   private readonly holesModel: Model<HolesDocument>

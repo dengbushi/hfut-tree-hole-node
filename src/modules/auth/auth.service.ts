@@ -4,15 +4,17 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { ConfigService } from '@nestjs/config'
 import { AxiosError } from 'axios'
+import { Request } from 'express'
 import { UserService } from '../user/user.service'
-import { createResponse } from '../../shared/utils/create'
-import { Users, UsersDocument } from '../../schema/user/user.schema'
-import { loginVerifyRequest } from '../../request/loginVerify'
 import { Role } from '../role/role.enum'
-import { isArray } from '../../shared/utils/is'
 import { LoginDataDto } from './dto/loginData.dto'
 import { RegisterDataDto } from './dto/registerData.dto'
 import { ForgetDataDto } from './dto/forgetData.dto'
+import { createResponse } from '@/shared/utils/create'
+import { Users, UsersDocument } from '@/schema/user/user.schema'
+import { loginVerifyRequest } from '@/request/loginVerify'
+import { isArray } from '@/shared/utils/is'
+import { parseUA } from '@/shared/utils/parseUA'
 
 @Injectable()
 export class AuthService {
@@ -28,14 +30,17 @@ export class AuthService {
   @InjectModel(Users.name)
   private readonly userModel: Model<UsersDocument>
 
-  async login(dto: LoginDataDto) {
+  async login(dto: LoginDataDto, req: Request) {
     const user = await this.userService.findOne(dto)
 
     if (!user) {
       throw new UnauthorizedException('密码错误')
-    } else {
-      return createResponse('登录成功', { token: this.signToken(user.studentId, Role.User) })
     }
+
+    // TODO login info
+    // const ua = parseUA(req.headers)
+
+    return createResponse('登录成功', { token: this.signToken(user.studentId, Role.User) })
   }
 
   async register(dto: RegisterDataDto) {
@@ -56,6 +61,7 @@ export class AuthService {
     const roles = [Role.User]
     const user = await new this.userModel({
       ...dto,
+      loginInfo: [],
       roles,
     }).save()
 

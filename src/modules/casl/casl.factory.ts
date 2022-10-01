@@ -1,9 +1,9 @@
 import { Ability, AbilityBuilder, AbilityClass, ExtractSubjectType, InferSubjects } from '@casl/ability'
 import { Inject, Injectable } from '@nestjs/common'
-import { Action } from '../../common/enums/action.enum'
-import { IUser } from '../../env'
-import { Comment, Holes } from '../../schema/treehole/holes.schema'
 import { RoleService } from '../role/role.service'
+import { Action } from '@/common/enums/action.enum'
+import { IUser } from '@/env'
+import { Comment, Holes } from '@/schema/treehole/holes.schema'
 
 type Subjects = InferSubjects<typeof Holes | typeof Comment> | 'all'
 

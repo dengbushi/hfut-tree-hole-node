@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
-import { MessageWallTags, MessageWallTagsDocument, MessageWallTagsTypes } from '../../schema/message-wall/tags.schema'
+import { MessageWallTags, MessageWallTagsDocument, MessageWallTagsTypes } from '@/schema/message-wall/tags.schema'
 
 @Injectable()
 export class MessageWallTagsService {

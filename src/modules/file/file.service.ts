@@ -2,8 +2,8 @@ import { Inject, Injectable, LoggerService } from '@nestjs/common'
 import { InjectRedis } from '@liaoliaots/nestjs-redis'
 import Redis from 'ioredis'
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston'
-import { Roles } from '../../common/decorators/roles.decorator'
 import { Role } from '../role/role.enum'
+import { Roles } from '@/common/decorators/roles.decorator'
 
 @Injectable()
 @Roles([Role.User, Role.Admin])

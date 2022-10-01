@@ -1,6 +1,5 @@
 import Mongoose from 'mongoose'
 import { ValidationOptions, registerDecorator } from 'class-validator'
-import { IsModeExist } from '../../modules/treehole/dto/mode.dto'
 
 export const createResponse = <T extends object>(msg: string, data: T = {} as T, code = 200) => {
   return {

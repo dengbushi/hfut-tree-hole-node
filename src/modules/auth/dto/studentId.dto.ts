@@ -5,9 +5,9 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator'
 import { Inject, Injectable, NotFoundException } from '@nestjs/common'
-import { NumberLength } from '../../../common/decorators/NumberLength.decorator'
-import { UserService } from '../../user/user.service'
-import { createClassValidator } from '../../../shared/utils/create'
+import { NumberLength } from '@/common/decorators/NumberLength.decorator'
+import { UserService } from '@/modules/user/user.service'
+import { createClassValidator } from '@/shared/utils/create'
 
 @ValidatorConstraint({ async: true })
 @Injectable()

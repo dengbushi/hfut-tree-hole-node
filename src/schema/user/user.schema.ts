@@ -22,6 +22,9 @@ export class Users {
     holeIds: number[]
 
   @Prop({ type: [{ type: Object }] })
+    loginInfo: { ip: string; date: Date; ua: string }
+
+  @Prop({ type: [{ type: Object }] })
     roles: Role[]
 }
 

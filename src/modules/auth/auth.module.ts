@@ -4,12 +4,12 @@ import { JwtModule } from '@nestjs/jwt'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
 import { UserModule } from '../user/user.module'
-import { Users, UsersSchema } from '../../schema/user/user.schema'
 import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
 import { LocalStrategy } from './guard/local.strategy'
 import { JwtStrategy } from './guard/jwt.strategy'
 import { ValidateStudentExistId } from './dto/studentId.dto'
+import { Users, UsersSchema } from '@/schema/user/user.schema'
 
 @Module({
   imports: [

@@ -1,10 +1,10 @@
-import { IsString, MaxLength } from 'class-validator'
-import { IsValidHoleIdDto, IsValidId } from '../../treehole/dto/utils'
+import { IsMongoId, IsString, MaxLength } from 'class-validator'
+import { IsValidHoleIdDto } from '../../treehole/dto/utils'
 import { IsValidCommentId } from '../../treehole/dto/comment.dto'
 
 export class ReportCommentDto {
   @IsValidCommentId()
-  @IsValidId()
+  @IsMongoId()
     id: string
 
   @MaxLength(200, {

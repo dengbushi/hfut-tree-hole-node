@@ -2,15 +2,15 @@ import { Inject, Injectable, InternalServerErrorException, NotAcceptableExceptio
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { LoginDataDto } from '../auth/dto/loginData.dto'
-import { isNumber } from '../../shared/utils/is'
 import { RegisterDataDto } from '../auth/dto/registerData.dto'
-import { Users, UsersDocument } from '../../schema/user/user.schema'
-import { createResponse } from '../../shared/utils/create'
-import { set } from '../../shared/utils/object'
-import { IUser } from '../../env'
-import { Holes, HolesDocument } from '../../schema/treehole/holes.schema'
-import { UserDaoService } from '../../dao/user/user.service'
 import { UpdateDto } from './dto/update.dto'
+import { isNumber } from '@/shared/utils/is'
+import { Users, UsersDocument } from '@/schema/user/user.schema'
+import { createResponse } from '@/shared/utils/create'
+import { set } from '@/shared/utils/object'
+import { IUser } from '@/env'
+import { Holes, HolesDocument } from '@/schema/treehole/holes.schema'
+import { UserDaoService } from '@/dao/user/user.service'
 
 @Injectable()
 export class UserService {
@@ -60,6 +60,22 @@ export class UserService {
     } catch (err) {
       throw new InternalServerErrorException('用户信息更新失败')
     }
+  }
+
+  async getHoles(user: IUser) {
+    const list = await this.holesModel.find({ userId: user.studentId }, { comments: 0, delete: 0 })
+
+    return createResponse('获取用户树洞列表成功', list)
+  }
+
+  async getHolesLike(user: IUser) {
+    const list = await this.holesModel.find({
+      starUserIds: {
+        $elemMatch: { $eq: user.studentId },
+      },
+    }, { starUserIds: 0, userId: 0, comments: 0, delete: 0 })
+
+    return createResponse('获取用户树洞star列表成功', list)
   }
 
   async findOne<T extends '_id' | '__v' | keyof Users>(

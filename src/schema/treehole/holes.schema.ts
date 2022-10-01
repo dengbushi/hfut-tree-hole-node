@@ -46,6 +46,9 @@ export class Holes {
   @Prop({ type: [{ type: Object, ref: () => Comment }] })
     comments: Comment[]
 
+  @Prop({ type: [{ type: Object }] })
+    options?: { option: string; voteNum: number }[]
+
   @Prop({ type: Boolean, index: 1, default: false })
     delete: boolean
 
