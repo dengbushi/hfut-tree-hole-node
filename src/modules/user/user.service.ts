@@ -23,16 +23,16 @@ export class UserService {
   @Inject()
   private readonly userDaoService: UserDaoService
 
-  async getUserInfo(payload: IUser): Promise<any> {
+  async getUserInfo(user: IUser): Promise<any> {
     try {
-      const user = await this.findOne(payload.studentId)
-      const holes = await this.userDaoService.getUserHoles(payload)
-      const stars = await this.userDaoService.getStaredHoles(payload)
+      const userData = await this.findOne(user.studentId)
+      const holes = await this.getHoles(user)
+      const stars = await this.getHolesStar(user)
 
       const data = {
-        user,
-        holesPostNum: holes.length || 0,
-        stars: stars.length || 0,
+        user: userData,
+        holesPostNum: holes.data.length || 0,
+        stars: stars.data.length || 0,
       }
       return createResponse('用户信息获取成功', data)
     } catch (err) {
@@ -68,7 +68,7 @@ export class UserService {
     return createResponse('获取用户树洞列表成功', list)
   }
 
-  async getHolesLike(user: IUser) {
+  async getHolesStar(user: IUser) {
     const list = await this.holesModel.find({
       starUserIds: {
         $elemMatch: { $eq: user.studentId },

@@ -24,7 +24,7 @@ export class UserController {
 
   @Get('holes/star')
   async getHolesLike(@Req() req: Request) {
-    return this.userService.getHolesLike(req.user)
+    return this.userService.getHolesStar(req.user)
   }
 
   @Post('update')
