@@ -10,8 +10,8 @@ export class RegisterDataDto extends HfutPasswordDto {
   @IsNotEmpty({
     message: '用户名不能为空',
   })
-  @Length(1, 20, {
-    message: '用户名长度不能超过20个字符',
+  @Length(1, 10, {
+    message: '用户名长度不能超过10个字符',
   })
     username: string
 }
