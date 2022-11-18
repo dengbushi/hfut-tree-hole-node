@@ -1,22 +1,19 @@
 import {
-  BadRequestException,
+  BadRequestException, CACHE_MANAGER,
   Inject,
   Injectable,
-  InternalServerErrorException,
+  InternalServerErrorException, LoggerService,
   NotFoundException,
 } from '@nestjs/common'
-import { InjectModel } from '@nestjs/mongoose'
+import { InjectConnection, InjectModel } from '@nestjs/mongoose'
 import mongoose, { Model } from 'mongoose'
 import type { HoleDetailDocument } from 'src/schema/treehole/holeDetail.schema'
 import { InjectRedis } from '@liaoliaots/nestjs-redis'
 import Redis from 'ioredis'
-import { createResponse } from '../../shared/utils/create'
-import { Holes, HolesDocument } from '../../schema/treehole/holes.schema'
-import { TreeholeDaoService } from '../../dao/treehole/treehole-dao.service'
-import { IUser } from '../../env'
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston'
+import type { Cache } from 'cache-manager'
 import { CaslAbilityFactory } from '../casl/casl.factory'
 import { Role } from '../role/role.enum'
-import { HoleDetail } from '../../schema/treehole/holeDetail.schema'
 import {
   CreateCommentDto,
   CreateHoleDto,
@@ -27,6 +24,13 @@ import {
 } from './dto/treehole.dto'
 import { IsValidHoleIdDto } from './dto/utils'
 import { HoleSearchDto } from './dto/search.dto'
+import { HoleDetail } from '@/schema/treehole/holeDetail.schema'
+import { IUser } from '@/env'
+import { TreeholeDaoService } from '@/dao/treehole/treehole-dao.service'
+import { Holes, HolesDocument } from '@/schema/treehole/holes.schema'
+import { createResponse } from '@/shared/utils/create'
+import { HolesCount, HolesCountDocument } from '@/schema/treehole/count.schema'
+import { cacheKey } from '@/shared/constant/cacheKeys'
 
 @Injectable()
 export class TreeholeService {
@@ -39,12 +43,23 @@ export class TreeholeService {
   @InjectModel(HoleDetail.name)
   private readonly holeDetailModel: Model<HoleDetailDocument>
 
+  @InjectModel(HolesCount.name)
+  private readonly holesCountModel: Model<HolesCountDocument>
+
   @Inject()
   private readonly caslFacotry: CaslAbilityFactory
+
+  @Inject(WINSTON_MODULE_NEST_PROVIDER)
+  private readonly logger: LoggerService
+
+  @Inject(CACHE_MANAGER)
+  private cacheManager: Cache
 
   constructor(
     @InjectRedis()
     private readonly redis: Redis,
+    @InjectConnection()
+    private readonly connection: mongoose.Connection,
   ) {}
 
   async getList(dto: TreeholeListDto, user: IUser) {
@@ -64,24 +79,57 @@ export class TreeholeService {
   }
 
   async createHole(dto: CreateHoleDto, user: IUser) {
-    const lastHole = (await this.holesModel.find().sort({ id: -1 }))[0]
+    const transactionSession = await this.connection.startSession()
+    let generatedId: number
 
-    const id = lastHole ? lastHole.id + 1 : 0
+    try {
+      await transactionSession.withTransaction(async() => {
+        const id = (await this.holesCountModel.findOne()).count + 1
+        const hole = await new this.holesModel({
+          userId: user.studentId,
+          ...dto,
+          id,
+          stars: 0,
+          options: dto.options ? dto.options.map(item => ({ option: item, voteNum: 0 })) : [],
+        }).save()
 
-    const hole = await new this.holesModel({
-      userId: user.studentId,
-      ...dto,
-      id,
-      stars: Number(Math.random() * 1000).toFixed(0),
-      options: dto.options ? dto.options.map(item => ({ option: item, voteNum: 0 })) : [],
-    }).save()
+        await this.holesCountModel.updateOne({}, { $inc: { count: 1 } })
 
-    return createResponse('创建树洞成功', { id: hole.id })
+        generatedId = hole.id
+      })
+    } catch (err) {
+      this.logger.error(err.stack.toString())
+      throw new InternalServerErrorException('创建树洞失败')
+    }
+
+    return createResponse('创建树洞成功', { id: generatedId })
   }
 
   async removeHole(dto: IsValidHoleIdDto) {
-    // 不删除树洞，改变状态以达到删除效果
-    await this.holesModel.updateOne({ id: dto.id }, { delete: true })
+    const transactionSession = await this.connection.startSession()
+
+    // TODO 解决事务问题
+    try {
+      await transactionSession.withTransaction(async() => {
+        const hole = await this.cacheManager.get(cacheKey.Hole)
+        await this.holesModel.remove({ id: dto.id })
+
+        const count = await this.holesCountModel.findOne()
+        await this.holesCountModel.updateOne({
+          _id: count._id,
+        }, {
+          $push: {
+            removedList: hole,
+          },
+        })
+      })
+    } catch (err) {
+      this.logger.error(err.stack.toString())
+      throw new InternalServerErrorException('删除树洞失败')
+    } finally {
+      await this.cacheManager.del(cacheKey.Hole)
+      await transactionSession.endSession()
+    }
 
     return createResponse('删除成功')
   }

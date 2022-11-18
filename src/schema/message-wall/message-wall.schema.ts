@@ -1,8 +1,8 @@
 import { Prop, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
-import { BaseSchema } from '../../common/decorators/BaseSchema.decorator'
 import { Comment } from '../treehole/holes.schema'
 import { MessageWallTagsTypes } from './tags.schema'
+import { BaseSchema } from '@/common/decorators/BaseSchema.decorator'
 
 export type MessageWallDocument = MessageWall & Document
 

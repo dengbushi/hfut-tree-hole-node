@@ -1,11 +1,11 @@
 import { Body, Controller, Inject, Patch, Post, Req } from '@nestjs/common'
 import { Request } from 'express'
 import { ApiTags } from '@nestjs/swagger'
-import { Roles } from '../../common/decorators/roles.decorator'
-import { Police } from '../../common/guards/policies.guard'
-import { CommentDtoCacheKey, ValidateHoleCacheKey } from '../../shared/constant/cacheKeys'
 import { ReportCommentDto, ReportHoleDto } from './dto/report.dto'
 import { ReportService } from './report.service'
+import { Roles } from '@/common/decorators/roles.decorator'
+import { Police } from '@/common/guards/policies.guard'
+import { CommentDtoCacheKey, ValidateHoleCacheKey } from '@/shared/constant/cacheKeys'
 
 @ApiTags('举报模块')
 @Roles()

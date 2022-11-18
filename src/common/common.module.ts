@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { CacheModule, Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core'
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
@@ -8,14 +8,14 @@ import { WinstonModule } from 'nest-winston'
 import { format } from 'winston'
 import * as winston from 'winston'
 import * as DailyRotateFile from 'winston-daily-rotate-file'
-import { AuthModule } from '../modules/auth/auth.module'
-import { JwtAuthGuard } from '../modules/auth/guard/jwt.guard'
-import { RolesGuard } from '../modules/role/guard/role.guard'
-import { Users, UsersSchema } from '../schema/user/user.schema'
-import { TreeholeDaoService } from '../dao/treehole/treehole-dao.service'
-import { Holes, HolesSchema } from '../schema/treehole/holes.schema'
-import { FileService } from '../modules/file/file.service'
 import { LoggerInterceptor } from './interceptors/logger.interceptor'
+import { AuthModule } from '@/modules/auth/auth.module'
+import { JwtAuthGuard } from '@/modules/auth/guard/jwt.guard'
+import { RolesGuard } from '@/modules/role/guard/role.guard'
+import { Users, UsersSchema } from '@/schema/user/user.schema'
+import { TreeholeDaoService } from '@/dao/treehole/treehole-dao.service'
+import { Holes, HolesSchema } from '@/schema/treehole/holes.schema'
+import { FileService } from '@/modules/file/file.service'
 
 @Module({
   imports: [
@@ -30,6 +30,7 @@ import { LoggerInterceptor } from './interceptors/logger.interceptor'
         port: 6379,
       },
     }, true),
+    CacheModule.register(),
     WinstonModule.forRootAsync({
       useFactory: () => {
         const myFormat = format.printf(({ level, message, label, timestamp }) => {

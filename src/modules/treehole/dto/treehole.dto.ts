@@ -1,7 +1,6 @@
 import {
   ArrayMaxSize,
   ArrayMinSize,
-  ArrayUnique,
   IsMongoId,
   IsNotEmpty,
   IsOptional,
@@ -9,11 +8,11 @@ import {
   MaxLength,
 } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
-import { PaginationDto } from '../../../common/dto/pagination.schema'
-import { TreeholeConst } from '../../../shared/constant/treehole'
-import { Validate } from '../../../shared/utils/dto'
 import { IsValidHoleIdDto } from './utils'
 import { IsTreeholeMode } from './mode.dto'
+import { PaginationDto } from '@/common/dto/pagination.schema'
+import { TreeholeConst } from '@/shared/constant/treehole'
+import { Validate } from '@/shared/utils/dto'
 
 export class TreeholeListDto extends PaginationDto {
   @ApiProperty({ type: String, description: '树洞mode' })

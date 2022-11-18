@@ -17,10 +17,12 @@ import {
 import { ModeService } from './mode.service'
 import { IsValidHoleIdDto } from './dto/utils'
 import { HoleSearchDto } from './dto/search.dto'
+import { Police } from '@/common/guards/policies.guard'
 
 @ApiTags('树洞模块')
 @ApiBearerAuth()
 @Roles()
+@Police()
 @Controller('treehole')
 export class TreeholeController {
   @Inject()
@@ -60,7 +62,7 @@ export class TreeholeController {
     return this.treeholeService.createHole(dto, req.user)
   }
 
-  @CheckPolicies(new DeleteHolePolicyHandler())
+  @CheckPolicies(DeleteHolePolicyHandler)
   @Delete('remove')
   async removeHole(
     @Body() dto: IsValidHoleIdDto,

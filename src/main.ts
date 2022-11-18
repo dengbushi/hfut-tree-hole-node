@@ -3,8 +3,10 @@ import { NestFactory } from '@nestjs/core'
 import helmet from 'helmet'
 import { useContainer } from 'class-validator'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import { Model } from 'mongoose'
 import { AppModule } from './app.module'
 import { HttpExceptionFilter } from './common/filters/http-exception.filter'
+import { HolesCountDocument } from '@/schema/treehole/count.schema'
 
 function setupGlobalHandler(app: INestApplication) {
   // filters
@@ -55,10 +57,22 @@ function setupGlobalHandler(app: INestApplication) {
   })
 }
 
+async function initDatabase(app: INestApplication) {
+  const holesCountModel = app.get<Model<HolesCountDocument>>('HolesCountModel')
+
+  if (await holesCountModel.countDocuments().exec() === 0) {
+    (await holesCountModel.create({
+      count: 0,
+      removedList: [],
+    })).save()
+  }
+}
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
 
   setupGlobalHandler(app)
+  await initDatabase(app)
 
   await app.listen(8000)
 }

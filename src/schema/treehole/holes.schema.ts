@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import mongoose, { Document } from 'mongoose'
-import { BaseSchema } from '../../common/decorators/BaseSchema.decorator'
+import { BaseSchema } from '@/common/decorators/BaseSchema.decorator'
 
 export type HolesDocument = Holes & Document
 

@@ -7,9 +7,9 @@ import {
 import { CACHE_MANAGER, Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Cache } from 'cache-manager'
-import { Holes, HolesDocument } from '../../../schema/treehole/holes.schema'
-import { CommentDtoCacheKey } from '../../../shared/constant/cacheKeys'
-import { createClassValidator } from '../../../shared/utils/create'
+import { Holes, HolesDocument } from '@/schema/treehole/holes.schema'
+import { cacheKey } from '@/shared/constant/cacheKeys'
+import { createClassValidator } from '@/shared/utils/create'
 
 @ValidatorConstraint({ async: true })
 @Injectable()
@@ -34,7 +34,7 @@ export class ValidateCommentId implements ValidatorConstraintInterface {
       throw new NotFoundException('该评论不存在')
     }
 
-    await this.cacheManager.set(CommentDtoCacheKey, isCommentExist)
+    await this.cacheManager.set(cacheKey.HoleComment, isCommentExist)
 
     return true
   }

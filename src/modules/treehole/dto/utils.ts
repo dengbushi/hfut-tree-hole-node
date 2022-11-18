@@ -1,18 +1,19 @@
 import {
   IsNumber,
-  ValidationArguments, ValidationOptions, ValidatorConstraint, ValidatorConstraintInterface, registerDecorator,
+  ValidationArguments,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
 } from 'class-validator'
 import { BadRequestException, CACHE_MANAGER, Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import mongoose, { Model } from 'mongoose'
+import { Model } from 'mongoose'
 import { ApiProperty } from '@nestjs/swagger'
 import { InjectRedis } from '@liaoliaots/nestjs-redis'
 import Redis from 'ioredis'
 import { Cache } from 'cache-manager'
-import { TreeholeDaoService } from '../../../dao/treehole/treehole-dao.service'
-import { Holes, HolesDocument } from '../../../schema/treehole/holes.schema'
-import { ValidateHoleCacheKey } from '../../../shared/constant/cacheKeys'
-import { createClassValidator } from '../../../shared/utils/create'
+import { Holes, HolesDocument } from '@/schema/treehole/holes.schema'
+import { cacheKey } from '@/shared/constant/cacheKeys'
+import { createClassValidator } from '@/shared/utils/create'
 
 @ValidatorConstraint({ async: true })
 @Injectable()
@@ -21,7 +22,7 @@ export class ValidateHoleId implements ValidatorConstraintInterface {
   private readonly holesModel: Model<HolesDocument>
 
   @Inject(CACHE_MANAGER)
-  private cacheManager: Cache
+  private readonly cacheManager: Cache
 
   constructor(
     @InjectRedis()
@@ -35,7 +36,7 @@ export class ValidateHoleId implements ValidatorConstraintInterface {
     }
     const isHoleExist = await this.holesModel.findOne({ id, delete: false })
 
-    await this.cacheManager.set(ValidateHoleCacheKey, isHoleExist)
+    await this.cacheManager.set(cacheKey.Hole, isHoleExist)
 
     if (!isHoleExist) {
       throw new NotFoundException('没有找到这个树洞哦~')

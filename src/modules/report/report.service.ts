@@ -2,13 +2,13 @@ import { BadRequestException, CACHE_MANAGER, Inject, Injectable, NotFoundExcepti
 import { InjectModel } from '@nestjs/mongoose'
 import Mongoose, { Model } from 'mongoose'
 import { Cache } from 'cache-manager'
-import { Report, ReportDocument, ReportTypes } from '../../schema/report/report.schema'
-import { Holes, HolesDocument } from '../../schema/treehole/holes.schema'
-import { createResponse } from '../../shared/utils/create'
-import { IUser } from '../../env'
-import { TreeholeDaoService } from '../../dao/treehole/treehole-dao.service'
-import { CommentDtoCacheKey, ValidateHoleCacheKey } from '../../shared/constant/cacheKeys'
 import { ReportCommentDto, ReportHoleDto } from './dto/report.dto'
+import { Report, ReportDocument, ReportTypes } from '@/schema/report/report.schema'
+import { Holes, HolesDocument } from '@/schema/treehole/holes.schema'
+import { createResponse } from '@/shared/utils/create'
+import { IUser } from '@/env'
+import { TreeholeDaoService } from '@/dao/treehole/treehole-dao.service'
+import { cacheKey } from '@/shared/constant/cacheKeys'
 
 @Injectable()
 export class ReportService {
@@ -43,7 +43,7 @@ export class ReportService {
       report.save()
     }
 
-    await this.cacheManager.del(ValidateHoleCacheKey)
+    await this.cacheManager.del(cacheKey.Hole)
 
     return createResponse('举报成功')
   }
@@ -69,7 +69,7 @@ export class ReportService {
     },
     { $set: { 'reportUsers.$.msg': dto.msg } })
 
-    await this.cacheManager.del(ValidateHoleCacheKey)
+    await this.cacheManager.del(cacheKey.Hole)
 
     return createResponse('修改举报评论成功')
   }
@@ -81,10 +81,10 @@ export class ReportService {
     let type: ReportTypes
 
     switch (key) {
-      case ValidateHoleCacheKey:
+      case cacheKey.Hole:
         type = ReportTypes.HOLE
         break
-      case CommentDtoCacheKey:
+      case cacheKey.HoleComment:
         type = ReportTypes.COMMENT
         break
     }
