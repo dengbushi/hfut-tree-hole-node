@@ -18,6 +18,9 @@ export class Comment {
   @Prop(Date)
     createTime: Date
 
+  @Prop(mongoose.Types.ObjectId)
+    replyTo?: mongoose.Types.ObjectId
+
   constructor(attrs) {
     Object.assign(this, attrs)
   }

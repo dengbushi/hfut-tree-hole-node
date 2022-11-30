@@ -9,9 +9,9 @@ import { Request } from 'express'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Role } from '../role.enum'
-import { ROLES_KEY } from '../../../common/decorators/roles.decorator'
-import { IS_PUBLIC_KEY } from '../../../common/decorators/public.decorator'
-import { Users, UsersDocument } from '../../../schema/user/user.schema'
+import { ROLES_KEY } from '@/common/decorators/roles.decorator'
+import { IS_PUBLIC_KEY } from '@/common/decorators/public.decorator'
+import { Users, UsersDocument } from '@/schema/user/user.schema'
 
 @Injectable()
 export class RolesGuard implements CanActivate {

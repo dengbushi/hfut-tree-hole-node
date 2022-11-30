@@ -4,7 +4,7 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator'
-import { BadRequestException, CACHE_MANAGER, Inject, Injectable, NotFoundException } from '@nestjs/common'
+import { CACHE_MANAGER, Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { ApiProperty } from '@nestjs/swagger'
@@ -31,9 +31,6 @@ export class ValidateHoleId implements ValidatorConstraintInterface {
   }
 
   async validate(id: unknown, args: ValidationArguments) {
-    if (isNaN(id as number)) {
-      throw new BadRequestException('id格式错误')
-    }
     const isHoleExist = await this.holesModel.findOne({ id, delete: false })
 
     await this.cacheManager.set(cacheKey.Hole, isHoleExist)

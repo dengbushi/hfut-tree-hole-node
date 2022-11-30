@@ -83,7 +83,7 @@ export class TreeholeDaoService {
       pipeLineStage.unshift({
         $match: {
           stars: {
-            $gt: 200,
+            $gt: 0,
           },
         },
       })
@@ -93,7 +93,7 @@ export class TreeholeDaoService {
     }
 
     try {
-      const queryRes = await this.holesModel.aggregate([...pipeLineStage, ...[{ $skip: skip }, { $limit: dto.limit }]]) as ITreeholeListPipeLineStage[]
+      const queryRes = await this.holesModel.aggregate([...pipeLineStage, ...[{ $skip: Math.abs(skip) }, { $limit: dto.limit }]]) as ITreeholeListPipeLineStage[]
 
       const pageRes = await this.holesModel.aggregate(pipeLineStage)
 

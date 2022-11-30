@@ -28,6 +28,10 @@ export class CaslAbilityFactory {
       can(Action.Read, 'all')
     }
 
+    if (isBanned && !isAdmin) {
+      cannot(Action.Manage, 'all')
+    }
+
     can(Action.Read, Holes)
     can(Action.Create, Holes)
     can(Action.Update, Holes, { userId: user.studentId })
@@ -35,10 +39,6 @@ export class CaslAbilityFactory {
 
     can(Action.Delete, Comment, { userId: user.studentId })
     can(Action.Create, Comment)
-
-    if (isBanned) {
-      cannot(Action.Manage, 'all')
-    }
 
     return build({
       // Read https://casl.js.org/v5/en/guide/subject-type-detection#use-classes-as-subject-types for details

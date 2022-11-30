@@ -1,6 +1,6 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common'
+import { ForbiddenException, NotFoundException } from '@nestjs/common'
 import { Action } from '@/common/enums/action.enum'
-import { Holes } from '@/schema/treehole/holes.schema'
+import { Comment, Holes } from '@/schema/treehole/holes.schema'
 import { PoliceHandlerCallback } from '@/common/decorators/CheckPolicies.decorator'
 
 export const DeleteHolePolicyHandler: PoliceHandlerCallback = async(
@@ -17,8 +17,21 @@ export const DeleteHolePolicyHandler: PoliceHandlerCallback = async(
   const res = ability.can(Action.Delete, new Holes(hole))
 
   if (!res) {
-    throw new BadRequestException('你不能删除别人的树洞哦~')
+    throw new ForbiddenException('你不能删除别人的树洞哦~')
   }
 
   return res
+}
+
+export const DeleteCommentPolicyHandler: PoliceHandlerCallback = async(
+  ability,
+  req,
+) => {
+  const canDeleted = ability.can(Action.Delete, new Comment(req.user))
+
+  if (!canDeleted) {
+    throw new ForbiddenException('你不能删除别人的评论哦~')
+  }
+
+  return canDeleted
 }

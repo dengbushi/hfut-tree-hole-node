@@ -17,6 +17,7 @@ import { TreeholeDaoService } from '@/dao/treehole/treehole-dao.service'
 import { Holes, HolesSchema } from '@/schema/treehole/holes.schema'
 import { TreeholeMode, TreeholeModeSchema } from '@/schema/treehole/treeholeMode.schema'
 import { HolesCount, HolesCountSchema } from '@/schema/treehole/count.schema'
+import { HoleCacheService } from '@/modules/treehole/holeCache.service'
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { HolesCount, HolesCountSchema } from '@/schema/treehole/count.schema'
     ValidateHoleId,
     ValidateCommentId,
     TreeholeDaoService,
+    HoleCacheService,
     ModeService,
     CaslAbilityFactory,
     RoleService,

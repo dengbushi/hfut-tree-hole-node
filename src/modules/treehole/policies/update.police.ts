@@ -1,17 +1,20 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
-import { AppAbility } from '../../casl/casl.factory'
-import { IPolicyHandler } from '../../../common/decorators/CheckPolicies.decorator'
-import { Action } from '../../../common/enums/action.enum'
+import { ForbiddenException } from '@nestjs/common'
+import { PoliceHandlerCallback } from '@/common/decorators/CheckPolicies.decorator'
+import { Action } from '@/common/enums/action.enum'
+import { Holes } from '@/schema/treehole/holes.schema'
 
-@Injectable()
-export class UpdateHolePolicyHandler implements IPolicyHandler {
-  handle(ability: AppAbility, payload) {
-    const res = ability.can(Action.Update, payload)
+export const UpdateHolePolicyHandler: PoliceHandlerCallback = async(
+  ability,
+  req,
+  guard,
+) => {
+  const hole = await guard.treeholeDaoService.findById(req.body.id)
 
-    if (!res) {
-      throw new BadRequestException('你不能随意修改其他人的树洞哦~')
-    }
+  const canUpdated = ability.can(Action.Update, new Holes(hole))
 
-    return res
+  if (!canUpdated) {
+    throw new ForbiddenException('你不能修改别人的树洞哦~')
   }
+
+  return canUpdated
 }

@@ -70,6 +70,13 @@ export class CreateCommentDto extends IsValidHoleIdDto {
     content: string
 }
 
+export class ReplyCommentDto extends CreateCommentDto {
+  @ApiProperty({ type: String, description: '评论id' })
+  @IsMongoId()
+  @IsNotEmpty()
+    commentId: string
+}
+
 export class StarHoleDto extends IsValidHoleIdDto {}
 
 export class RemoveHoleCommentDto extends IsValidHoleIdDto {

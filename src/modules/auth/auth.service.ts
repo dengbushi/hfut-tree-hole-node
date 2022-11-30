@@ -14,8 +14,6 @@ import { createResponse } from '@/shared/utils/create'
 import { Users, UsersDocument } from '@/schema/user/user.schema'
 import { loginVerifyRequest } from '@/request/loginVerify'
 import { isArray } from '@/shared/utils/is'
-import { parseUA } from '@/shared/utils/parseUA'
-
 @Injectable()
 export class AuthService {
   @Inject()
@@ -97,7 +95,7 @@ export class AuthService {
 
   async verifyHfutAccount(dto: RegisterDataDto | ForgetDataDto) {
     try {
-      await loginVerifyRequest(`${this.configService.get('HFUTAPI_URL')}/login/verify`, {
+      await loginVerifyRequest(`${this.configService.get('HFUTAPI_URL')}/login`, {
         studentId: dto.studentId,
         hfutPassword: dto.hfutPassword,
       } as RegisterDataDto)

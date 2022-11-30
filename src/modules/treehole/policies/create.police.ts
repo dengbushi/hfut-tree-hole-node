@@ -1,11 +1,20 @@
-import { Injectable } from '@nestjs/common'
-import { AppAbility } from '../../casl/casl.factory'
-import { IPolicyHandler } from '../../../common/decorators/CheckPolicies.decorator'
-import { Action } from '../../../common/enums/action.enum'
+import { ForbiddenException } from '@nestjs/common'
+import { PoliceHandlerCallback } from '@/common/decorators/CheckPolicies.decorator'
+import { Action } from '@/common/enums/action.enum'
+import { Holes } from '@/schema/treehole/holes.schema'
 
-@Injectable()
-export class CreateHolePolicyHandler implements IPolicyHandler {
-  handle(ability: AppAbility, payload) {
-    return ability.can(Action.Read, payload)
+export const CreateHolePolicyHandler: PoliceHandlerCallback = async(
+  ability,
+  req,
+  guard,
+) => {
+  const hole = await guard.treeholeDaoService.findById(req.body.id)
+
+  const canCreated = ability.can(Action.Create, new Holes(hole))
+
+  if (!canCreated) {
+    throw new ForbiddenException('你不能创建树洞哦~')
   }
+
+  return canCreated
 }

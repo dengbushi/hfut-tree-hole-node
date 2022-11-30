@@ -17,7 +17,7 @@ import { Role } from '../role/role.enum'
 import {
   CreateCommentDto,
   CreateHoleDto,
-  RemoveHoleCommentDto,
+  RemoveHoleCommentDto, ReplyCommentDto,
   StarHoleDto,
   TreeholeDetailDto,
   TreeholeListDto,
@@ -30,7 +30,7 @@ import { TreeholeDaoService } from '@/dao/treehole/treehole-dao.service'
 import { Holes, HolesDocument } from '@/schema/treehole/holes.schema'
 import { createResponse } from '@/shared/utils/create'
 import { HolesCount, HolesCountDocument } from '@/schema/treehole/count.schema'
-import { cacheKey } from '@/shared/constant/cacheKeys'
+import { HoleCacheService } from '@/modules/treehole/holeCache.service'
 
 @Injectable()
 export class TreeholeService {
@@ -54,6 +54,9 @@ export class TreeholeService {
 
   @Inject(CACHE_MANAGER)
   private cacheManager: Cache
+
+  @Inject()
+  private holeCacheService: HoleCacheService
 
   constructor(
     @InjectRedis()
@@ -81,7 +84,6 @@ export class TreeholeService {
   async createHole(dto: CreateHoleDto, user: IUser) {
     const transactionSession = await this.connection.startSession()
     let generatedId: number
-
     try {
       await transactionSession.withTransaction(async() => {
         const id = (await this.holesCountModel.findOne()).count + 1
@@ -91,9 +93,9 @@ export class TreeholeService {
           id,
           stars: 0,
           options: dto.options ? dto.options.map(item => ({ option: item, voteNum: 0 })) : [],
-        }).save()
+        }).save({ session: transactionSession })
 
-        await this.holesCountModel.updateOne({}, { $inc: { count: 1 } })
+        await this.holesCountModel.updateOne({}, { $inc: { count: 1 } }, { session: transactionSession })
 
         generatedId = hole.id
       })
@@ -111,30 +113,27 @@ export class TreeholeService {
     // TODO 解决事务问题
     try {
       await transactionSession.withTransaction(async() => {
-        const hole = await this.cacheManager.get(cacheKey.Hole)
-        await this.holesModel.remove({ id: dto.id })
+        await this.holeCacheService.useHole(async(hole) => {
+          await this.holesModel.deleteOne({ id: dto.id }, { session: transactionSession })
 
-        const count = await this.holesCountModel.findOne()
-        await this.holesCountModel.updateOne({
-          _id: count._id,
-        }, {
-          $push: {
-            removedList: hole,
-          },
+          await this.holesCountModel.updateOne({}, {
+            $push: {
+              removedList: hole.toJSON() as Holes,
+            },
+          }, { session: transactionSession })
         })
       })
     } catch (err) {
       this.logger.error(err.stack.toString())
       throw new InternalServerErrorException('删除树洞失败')
     } finally {
-      await this.cacheManager.del(cacheKey.Hole)
       await transactionSession.endSession()
     }
 
     return createResponse('删除成功')
   }
 
-  async createComment(dto: CreateCommentDto, user: IUser) {
+  async createComment(dto: CreateCommentDto | ReplyCommentDto, user: IUser) {
     try {
       const id = new mongoose.Types.ObjectId()
       await this.holesModel.updateOne({ id: dto.id }, {
@@ -144,6 +143,7 @@ export class TreeholeService {
             userId: user.studentId,
             content: dto.content,
             createTime: new Date(),
+            replyTo: (dto as ReplyCommentDto).commentId ? new mongoose.Types.ObjectId((dto as ReplyCommentDto).commentId) : undefined,
           },
         },
       })
@@ -152,6 +152,10 @@ export class TreeholeService {
     } catch (err) {
       throw new InternalServerErrorException('留言失败')
     }
+  }
+
+  async replyComment(dto: CreateCommentDto, user: IUser) {
+    return this.createComment(dto, user)
   }
 
   async removeComment(dto: RemoveHoleCommentDto, user: IUser) {
@@ -187,11 +191,13 @@ export class TreeholeService {
   }
 
   async starHole(dto: StarHoleDto, user: IUser) {
-    const isStared = (await this.treeholeDaoService.findById(dto.id)).starUserIds.includes(user.studentId)
+    await this.holeCacheService.useHole(async(hole) => {
+      const isStared = hole.starUserIds.includes(user.studentId)
 
-    if (isStared) {
-      throw new BadRequestException('你已经star过该树洞啦~')
-    }
+      if (isStared) {
+        throw new BadRequestException('你已经star过该树洞啦~')
+      }
+    })
 
     try {
       await this.holesModel.updateOne({ id: dto.id }, {

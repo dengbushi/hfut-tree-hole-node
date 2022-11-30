@@ -12,7 +12,7 @@ export class UserController {
   @Inject()
   private readonly userService: UserService
 
-  @Get('getUserInfo')
+  @Get('user')
   async getUserInfo(@Req() req: Request) {
     return this.userService.getUserInfo(req.user)
   }

@@ -2,7 +2,7 @@ import { CanActivate, ExecutionContext, ForbiddenException, Inject, Injectable }
 import { Request } from 'express'
 import Redis from 'ioredis'
 import { InjectRedis } from '@liaoliaots/nestjs-redis'
-import { RoleService } from '../../modules/role/role.service'
+import { RoleService } from '@/modules/role/role.service'
 
 @Injectable()
 export class FileGuard implements CanActivate {
