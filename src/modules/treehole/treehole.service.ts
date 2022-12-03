@@ -30,7 +30,6 @@ import { TreeholeDaoService } from '@/dao/treehole/treehole-dao.service'
 import { Holes, HolesDocument } from '@/schema/treehole/holes.schema'
 import { createResponse } from '@/shared/utils/create'
 import { HolesCount, HolesCountDocument } from '@/schema/treehole/count.schema'
-import { HoleCacheService } from '@/modules/treehole/holeCache.service'
 
 @Injectable()
 export class TreeholeService {
@@ -54,9 +53,6 @@ export class TreeholeService {
 
   @Inject(CACHE_MANAGER)
   private cacheManager: Cache
-
-  @Inject()
-  private holeCacheService: HoleCacheService
 
   constructor(
     @InjectRedis()
@@ -113,15 +109,15 @@ export class TreeholeService {
     // TODO 解决事务问题
     try {
       await transactionSession.withTransaction(async() => {
-        await this.holeCacheService.useHole(async(hole) => {
-          await this.holesModel.deleteOne({ id: dto.id }, { session: transactionSession })
+        const hole = await this.holesModel.findOne({ id: dto.id })
 
-          await this.holesCountModel.updateOne({}, {
-            $push: {
-              removedList: hole.toJSON() as Holes,
-            },
-          }, { session: transactionSession })
-        })
+        await this.holesModel.deleteOne({ id: dto.id }, { session: transactionSession })
+
+        await this.holesCountModel.updateOne({}, {
+          $push: {
+            removedList: hole.toJSON() as Holes,
+          },
+        }, { session: transactionSession })
       })
     } catch (err) {
       this.logger.error(err.stack.toString())
@@ -143,7 +139,7 @@ export class TreeholeService {
             userId: user.studentId,
             content: dto.content,
             createTime: new Date(),
-            replyTo: (dto as ReplyCommentDto).commentId ? new mongoose.Types.ObjectId((dto as ReplyCommentDto).commentId) : undefined,
+            replyTo: null,
           },
         },
       })
@@ -191,13 +187,13 @@ export class TreeholeService {
   }
 
   async starHole(dto: StarHoleDto, user: IUser) {
-    await this.holeCacheService.useHole(async(hole) => {
-      const isStared = hole.starUserIds.includes(user.studentId)
+    const hole = await this.holesModel.findOne({ id: dto.id })
 
-      if (isStared) {
-        throw new BadRequestException('你已经star过该树洞啦~')
-      }
-    })
+    const isStared = hole.starUserIds.includes(user.studentId)
+
+    if (isStared) {
+      throw new BadRequestException('你已经star过该树洞啦~')
+    }
 
     try {
       await this.holesModel.updateOne({ id: dto.id }, {

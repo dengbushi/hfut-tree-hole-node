@@ -5,6 +5,7 @@ specifiers:
   '@antfu/ni': ^0.18.0
   '@casl/ability': ^6.0.0
   '@liaoliaots/nestjs-redis': ^9.0.2
+  '@medibloc/nestjs-request-context': ^1.0.1
   '@nestjs/cli': ^8.0.0
   '@nestjs/common': ^9.0.11
   '@nestjs/config': ^2.1.0
@@ -71,6 +72,7 @@ specifiers:
 dependencies:
   '@casl/ability': 6.0.0
   '@liaoliaots/nestjs-redis': 9.0.2_kd6gth4bwpxuv6pz4y37ggqspa
+  '@medibloc/nestjs-request-context': 1.0.1_hnyprbqcxrqt5d3mn24l2e4fxi
   '@nestjs/common': 9.0.11_izy6d3vkkuxhizhra6olmnxmau
   '@nestjs/config': 2.1.0_lhpjf6p5qzdioje3hfzma3fdte
   '@nestjs/core': 8.4.3_gla3k3zgcikejmpitkwpay7oty
@@ -987,6 +989,18 @@ packages:
       '@nestjs/core': 8.4.3_gla3k3zgcikejmpitkwpay7oty
       ioredis: 5.2.3
       tslib: 2.4.0
+    dev: false
+
+  /@medibloc/nestjs-request-context/1.0.1_hnyprbqcxrqt5d3mn24l2e4fxi:
+    resolution: {integrity: sha512-4z8FCSDlvbJOS/UcbSXdIB3q3+Vg3jAQYbucSR3uh8aKKG7oVmHCBnDrPS5WYAFy6G8f4bGP8TbQqiJD8bJpNQ==}
+    engines: {node: '>=14.15.2'}
+    peerDependencies:
+      '@nestjs/common': '>=7.5.5'
+      '@nestjs/platform-express': '>=7.5.5'
+      express: '>=4.17.1'
+    dependencies:
+      '@nestjs/common': 9.0.11_izy6d3vkkuxhizhra6olmnxmau
+      '@nestjs/platform-express': 8.4.3_2br7sjvwli636vv4fpjrn732yu
     dev: false
 
   /@nestjs/cli/8.2.4:

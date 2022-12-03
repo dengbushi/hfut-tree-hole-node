@@ -14,6 +14,7 @@ import { createResponse } from '@/shared/utils/create'
 import { Users, UsersDocument } from '@/schema/user/user.schema'
 import { loginVerifyRequest } from '@/request/loginVerify'
 import { isArray } from '@/shared/utils/is'
+
 @Injectable()
 export class AuthService {
   @Inject()
@@ -28,7 +29,7 @@ export class AuthService {
   @InjectModel(Users.name)
   private readonly userModel: Model<UsersDocument>
 
-  async login(dto: LoginDataDto, req: Request) {
+  async login(dto: LoginDataDto) {
     const user = await this.userService.findOne(dto)
 
     if (!user) {
