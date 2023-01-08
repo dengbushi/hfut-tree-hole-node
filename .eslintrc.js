@@ -5,7 +5,10 @@ module.exports = {
     sourceType: 'module',
   },
   plugins: ['@typescript-eslint/eslint-plugin'],
-  extends: ['@antfu'],
+  extends: [
+    'plugin:@typescript-eslint/recommended',
+    'plugin:prettier/recommended',
+  ],
   root: true,
   env: {
     node: true,
@@ -19,10 +22,8 @@ module.exports = {
       "brace-style": [2, "1tbs", { "allowSingleLine": true }],
       "no-useless-return": "off",
       "prefer-const": "off",
-      'indent': [2, 2, { 'SwitchCase': 1 }],
       "no-unused-expressions": "off",
       "@typescript-eslint/no-unused-vars": "off", // If open this, it will create some unexpected errors
-      "no-unused-vars": "error", // best choice
       "@typescript-eslint/no-use-before-define": "off",
       "@typescript-eslint/brace-style": "off",
       "@typescript-eslint/indent": "off",

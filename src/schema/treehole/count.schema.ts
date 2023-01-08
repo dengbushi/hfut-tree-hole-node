@@ -8,10 +8,10 @@ export type HolesCountDocument = HolesCount & Document
 @BaseSchema()
 export class HolesCount {
   @Prop({ type: Number, default: 0 })
-    count: number
+  count: number
 
   @Prop({ type: [{ type: Object, ref: 'Holes' }], default: [] })
-    removedList: Holes[]
+  removedList: Holes[]
 }
 
 export const HolesCountSchema = SchemaFactory.createForClass(HolesCount)

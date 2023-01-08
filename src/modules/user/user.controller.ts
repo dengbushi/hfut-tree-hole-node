@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Post, Req } from '@nestjs/common'
+import {Body, Controller, Get, Inject, Patch, Post, Req} from '@nestjs/common'
 import { Request } from 'express'
 import { ApiTags } from '@nestjs/swagger'
 import { UserService } from './user.service'
@@ -12,7 +12,7 @@ export class UserController {
   @Inject()
   private readonly userService: UserService
 
-  @Get('user')
+  @Get('info')
   async getUserInfo(@Req() req: Request) {
     return this.userService.getUserInfo(req.user)
   }
@@ -27,7 +27,7 @@ export class UserController {
     return this.userService.getHolesStar(req.user)
   }
 
-  @Post('update')
+  @Patch('update')
   async update(
     @Req() req: Request,
     @Body() dto: UpdateDto,

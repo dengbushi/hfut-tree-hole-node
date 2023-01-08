@@ -25,7 +25,7 @@ export class UserService {
 
   async getUserInfo(user: IUser): Promise<any> {
     try {
-      const userData = await this.findOne(user.studentId)
+      const userData = await this.findOne(user.studentId, ['password', 'holeIds', 'loginInfo'])
       const holes = await this.getHoles(user)
       const stars = await this.getHolesStar(user)
 
@@ -63,7 +63,7 @@ export class UserService {
   }
 
   async getHoles(user: IUser) {
-    const list = await this.holesModel.find({ userId: user.studentId }, { comments: 0, delete: 0 })
+    const list = await this.holesModel.find({ userId: user.studentId }, { starUserIds: 0, comments: 0 })
 
     return createResponse('获取用户树洞列表成功', list)
   }
@@ -73,7 +73,7 @@ export class UserService {
       starUserIds: {
         $elemMatch: { $eq: user.studentId },
       },
-    }, { starUserIds: 0, userId: 0, comments: 0, delete: 0 })
+    }, { starUserIds: 0, userId: 0, comments: 0 })
 
     return createResponse('获取用户树洞star列表成功', list)
   }

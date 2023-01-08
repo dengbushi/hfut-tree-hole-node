@@ -9,22 +9,22 @@ export type MessageWallDocument = MessageWall & Document
 @BaseSchema()
 export class MessageWall {
   @Prop({ type: Number, index: 1 })
-    userId: number
+  userId: number
 
   @Prop({ type: String, index: 1, enum: MessageWallTagsTypes })
-    tag: MessageWallTagsTypes
+  tag: MessageWallTagsTypes
 
   @Prop(String)
-    content: string
+  content: string
 
   @Prop({ type: Number, default: 0 })
-    like: number
+  like: number
 
   @Prop({ type: [{ type: Object, ref: () => Comment }] })
-    comments: Comment[]
+  comments: Comment[]
 
   @Prop(Number)
-    color: number
+  color: number
 }
 
 export const MessageWallSchema = SchemaFactory.createForClass(MessageWall)

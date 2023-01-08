@@ -3,24 +3,21 @@ import {
   ExecutionContext,
   ForbiddenException,
   Inject,
-  Injectable,
 } from '@nestjs/common'
-import { Request } from 'express'
-import Redis from 'ioredis'
 import { InjectRedis } from '@liaoliaots/nestjs-redis'
+import Redis from 'ioredis'
+import { Request } from 'express'
 import { RoleService } from '@/modules/role/role.service'
 import { constants } from '@/shared/constant/constants'
 
-@Injectable()
-export class FileGuard implements CanActivate {
+export class HolePostLimitGuard implements CanActivate {
   @Inject()
   private readonly roleService: RoleService
 
   constructor(
     @InjectRedis()
-    private readonly redis: Redis
+    private redis: Redis
   ) {}
-
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const { user } = context.switchToHttp().getRequest() as Request
 
@@ -30,16 +27,16 @@ export class FileGuard implements CanActivate {
       return true
     }
 
-    const redisKey = `file:upload:${user.studentId}`
+    const redisKey = `hole:post:${user.studentId}`
     const times = parseInt(await this.redis.get(redisKey))
 
     if (!times) {
       this.redis.set(redisKey, 1)
-    } else if (times < constants.maxUploadFileTimes) {
+    } else if (times < constants.maxPostHoleTimes) {
       this.redis.incrby(redisKey, 1)
     } else {
       throw new ForbiddenException(
-        `你一天只能上传${constants.maxUploadFileTimes}次文件哦`
+        `你一天只能新建${constants.maxPostHoleTimes}个树洞哦`
       )
     }
 

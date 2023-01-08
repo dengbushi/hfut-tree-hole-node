@@ -1,8 +1,10 @@
 import {
-  BadRequestException, CACHE_MANAGER,
+  BadRequestException,
+  CACHE_MANAGER,
   Inject,
   Injectable,
-  InternalServerErrorException, LoggerService,
+  InternalServerErrorException,
+  LoggerService,
   NotFoundException,
 } from '@nestjs/common'
 import { InjectConnection, InjectModel } from '@nestjs/mongoose'
@@ -17,7 +19,8 @@ import { Role } from '../role/role.enum'
 import {
   CreateCommentDto,
   CreateHoleDto,
-  RemoveHoleCommentDto, ReplyCommentDto,
+  RemoveHoleCommentDto,
+  ReplyCommentDto,
   StarHoleDto,
   TreeholeDetailDto,
   TreeholeListDto,
@@ -28,7 +31,7 @@ import { HoleDetail } from '@/schema/treehole/holeDetail.schema'
 import { IUser } from '@/env'
 import { TreeholeDaoService } from '@/dao/treehole/treehole-dao.service'
 import { Holes, HolesDocument } from '@/schema/treehole/holes.schema'
-import { createResponse } from '@/shared/utils/create'
+import { createMongoId, createResponse } from '@/shared/utils/create'
 import { HolesCount, HolesCountDocument } from '@/schema/treehole/count.schema'
 
 @Injectable()
@@ -58,7 +61,7 @@ export class TreeholeService {
     @InjectRedis()
     private readonly redis: Redis,
     @InjectConnection()
-    private readonly connection: mongoose.Connection,
+    private readonly connection: mongoose.Connection
   ) {}
 
   async getList(dto: TreeholeListDto, user: IUser) {
@@ -69,10 +72,14 @@ export class TreeholeService {
 
   async getDetail(dto: TreeholeDetailDto, user: IUser) {
     try {
-      const res = await this.treeholeDaoService.getDetail(dto.id, user.studentId)
+      const res = await this.treeholeDaoService.getDetail(
+        dto.id,
+        user.studentId
+      )
 
       return createResponse('获取树洞详情成功', res)
     } catch (err) {
+      this.logger.error(err.stack.toString())
       throw new InternalServerErrorException('获取树洞详情失败')
     }
   }
@@ -81,17 +88,23 @@ export class TreeholeService {
     const transactionSession = await this.connection.startSession()
     let generatedId: number
     try {
-      await transactionSession.withTransaction(async() => {
+      await transactionSession.withTransaction(async () => {
         const id = (await this.holesCountModel.findOne()).count + 1
         const hole = await new this.holesModel({
           userId: user.studentId,
           ...dto,
           id,
           stars: 0,
-          options: dto.options ? dto.options.map(item => ({ option: item, voteNum: 0 })) : [],
+          options: dto.options
+            ? dto.options.map((item) => ({ option: item, voteNum: 0 }))
+            : [],
         }).save({ session: transactionSession })
 
-        await this.holesCountModel.updateOne({}, { $inc: { count: 1 } }, { session: transactionSession })
+        await this.holesCountModel.updateOne(
+          {},
+          { $inc: { count: 1 } },
+          { session: transactionSession }
+        )
 
         generatedId = hole.id
       })
@@ -108,16 +121,23 @@ export class TreeholeService {
 
     // TODO 解决事务问题
     try {
-      await transactionSession.withTransaction(async() => {
+      await transactionSession.withTransaction(async () => {
         const hole = await this.holesModel.findOne({ id: dto.id })
 
-        await this.holesModel.deleteOne({ id: dto.id }, { session: transactionSession })
+        await this.holesModel.deleteOne(
+          { id: dto.id },
+          { session: transactionSession }
+        )
 
-        await this.holesCountModel.updateOne({}, {
-          $push: {
-            removedList: hole.toJSON() as Holes,
+        await this.holesCountModel.updateOne(
+          {},
+          {
+            $push: {
+              removedList: hole.toJSON() as Holes,
+            },
           },
-        }, { session: transactionSession })
+          { session: transactionSession }
+        )
       })
     } catch (err) {
       this.logger.error(err.stack.toString())
@@ -132,17 +152,27 @@ export class TreeholeService {
   async createComment(dto: CreateCommentDto | ReplyCommentDto, user: IUser) {
     try {
       const id = new mongoose.Types.ObjectId()
-      await this.holesModel.updateOne({ id: dto.id }, {
-        $push: {
-          comments: {
-            _id: id,
-            userId: user.studentId,
-            content: dto.content,
-            createTime: new Date(),
-            replyTo: null,
+      const isReply = !!(dto as ReplyCommentDto).commentId
+
+      await this.holesModel.updateOne(
+        { id: dto.id },
+        {
+          $push: {
+            comments: {
+              _id: id,
+              userId: user.studentId,
+              content: dto.content,
+              createTime: new Date(),
+              replyTo: isReply
+                ? createMongoId((dto as ReplyCommentDto).commentId)
+                : null,
+              parentId: isReply
+                ? createMongoId((dto as ReplyCommentDto).commentId)
+                : null,
+            },
           },
-        },
-      })
+        }
+      )
 
       return createResponse('留言成功', { commentId: id })
     } catch (err) {
@@ -167,18 +197,23 @@ export class TreeholeService {
       throw new NotFoundException('评论不存在')
     }
 
-    const comment = isCommentExist.comments.find(item => commentId.equals(item._id))
+    const comment = isCommentExist.comments.find((item) =>
+      commentId.equals(item._id)
+    )
 
     if (comment.userId !== user.studentId && !user.roles.includes(Role.Admin)) {
       throw new BadRequestException('不能删除其他人的评论')
     }
 
     try {
-      await this.holesModel.updateOne({ id: dto.id }, {
-        $pull: {
-          comments: { _id: commentId },
-        },
-      })
+      await this.holesModel.updateOne(
+        { id: dto.id },
+        {
+          $pull: {
+            comments: { _id: commentId },
+          },
+        }
+      )
 
       return createResponse('删除评论成功')
     } catch (err) {
@@ -196,12 +231,15 @@ export class TreeholeService {
     }
 
     try {
-      await this.holesModel.updateOne({ id: dto.id }, {
-        $inc: { stars: 1 },
-        $push: {
-          starUserIds: user.studentId as any,
-        },
-      })
+      await this.holesModel.updateOne(
+        { id: dto.id },
+        {
+          $inc: { stars: 1 },
+          $push: {
+            starUserIds: user.studentId as any,
+          },
+        }
+      )
 
       return createResponse('点赞树洞成功')
     } catch (err) {
@@ -219,11 +257,14 @@ export class TreeholeService {
     }
 
     try {
-      await this.holesModel.updateOne({ id: dto.id }, {
-        $pull: {
-          starUserIds: user.studentId as any,
-        },
-      })
+      await this.holesModel.updateOne(
+        { id: dto.id },
+        {
+          $pull: {
+            starUserIds: user.studentId as any,
+          },
+        }
+      )
 
       return createResponse('删除成功')
     } catch (err) {

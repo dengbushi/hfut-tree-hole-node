@@ -25,24 +25,29 @@ import { FileService } from '@/modules/file/file.service'
     }),
     ConfigModule,
     AuthModule,
-    RedisModule.forRoot({
-      config: {
-        port: 6379,
+    RedisModule.forRoot(
+      {
+        config: {
+          port: 6379,
+        },
       },
-    }, true),
+      true
+    ),
     CacheModule.register(),
     WinstonModule.forRootAsync({
       useFactory: () => {
-        const myFormat = format.printf(({ level, message, label, timestamp }) => {
-          return `${timestamp} [${level.toUpperCase()}]: ${message}`
-        })
+        const myFormat = format.printf(
+          ({ level, message, label, timestamp }) => {
+            return `${timestamp} [${level.toUpperCase()}]: ${message}`
+          }
+        )
 
         return {
           level: 'info',
           format: format.combine(
             format.timestamp(),
             myFormat,
-            format.colorize(),
+            format.colorize()
           ),
           transports: [
             new DailyRotateFile({

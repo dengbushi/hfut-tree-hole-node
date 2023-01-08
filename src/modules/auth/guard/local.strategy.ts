@@ -1,6 +1,11 @@
 import { PassportStrategy } from '@nestjs/passport'
 import { Strategy } from 'passport-local'
-import { Inject, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common'
+import {
+  Inject,
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common'
 import { isString } from 'class-validator'
 import { UserService } from '@/modules/user/user.service'
 

@@ -8,16 +8,17 @@ import { UserService } from '../user/user.service'
 import { RoleService } from '../role/role.service'
 import { FileService } from './file.service'
 import { FileController } from './file.controller'
-import { FileTaskService } from './fileTask.service'
 import { UserDaoService } from '@/dao/user/user.service'
 import { Holes, HolesSchema } from '@/schema/treehole/holes.schema'
 import { Users, UsersSchema } from '@/schema/user/user.schema'
 import { FileGuard } from '@/common/guards/file.guard'
+import * as process from 'process'
 
 const storage = multer.diskStorage({
   destination(req, file, cb) {
     const date = new Date()
-    const folderName = `/tmp/HFUTHole/${format(date, 'yyyy/MM/dd')}`
+    const folderName =
+      process.cwd() + `/tmp/HFUTHole/${format(date, 'yyyy/MM/dd')}`
 
     if (!fs.existsSync(folderName)) {
       fs.mkdirSync(folderName, { recursive: true })
@@ -40,14 +41,7 @@ const storage = multer.diskStorage({
       { name: Holes.name, schema: HolesSchema },
     ]),
   ],
-  providers: [
-    FileService,
-    FileGuard,
-    UserService,
-    UserDaoService,
-    RoleService,
-    FileTaskService,
-  ],
+  providers: [FileService, FileGuard, UserService, UserDaoService, RoleService],
   controllers: [FileController],
 })
 export class FileModule {}

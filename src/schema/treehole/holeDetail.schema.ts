@@ -6,7 +6,7 @@ export type HoleDetailDocument = HoleDetail & Document
 @Schema()
 export class HoleDetail {
   @Prop(Number)
-    count: number
+  count: number
 }
 
 export const HoleDetailSchema = SchemaFactory.createForClass(HoleDetail)

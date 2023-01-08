@@ -17,9 +17,15 @@ export function get<T extends object, K extends keyof T>(
 
 export function unset<T extends object, K extends keyof T>(
   obj: T,
-  key: K,
+  key: K | K[],
 ) {
-  return Reflect.deleteProperty(obj, key)
+  if (!Array.isArray(key)) {
+    key = [key]
+  }
+
+  for (const k of key) {
+    Reflect.deleteProperty(obj, k)
+  }
 }
 
 export const hasProp = <T extends object, K extends keyof T>(obj: T, key: K) => Reflect.has(obj, key)

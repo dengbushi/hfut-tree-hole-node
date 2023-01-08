@@ -14,7 +14,9 @@ import { FileModule } from './modules/file/file.module'
 import { ReportModule } from './modules/report/report.module'
 import { MessageWallModule } from './modules/message-wall/message-wall.module'
 import { NotifyModule } from './modules/notify/notify.module'
+import { TaskModule } from './modules/task/task.module'
 import databaseConfig from './config/database.config'
+import { MulterModule } from '@nestjs/platform-express'
 
 @Module({
   imports: [
@@ -42,6 +44,7 @@ import databaseConfig from './config/database.config'
     ReportModule,
     MessageWallModule,
     NotifyModule,
+    TaskModule,
   ],
   controllers: [],
 })

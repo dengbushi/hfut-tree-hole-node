@@ -1,12 +1,26 @@
-import { Body, Controller, Delete, Get, Inject, Post, Query, Req } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Inject,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { Request } from 'express'
-import { DeleteCommentPolicyHandler, DeleteHolePolicyHandler } from './policies/delete.police'
+import {
+  DeleteCommentPolicyHandler,
+  DeleteHolePolicyHandler,
+} from './policies/delete.police'
 import { TreeholeService } from './treehole.service'
 import {
   CreateCommentDto,
   CreateHoleDto,
-  RemoveHoleCommentDto, ReplyCommentDto,
+  RemoveHoleCommentDto,
+  ReplyCommentDto,
   StarHoleDto,
   TreeholeDetailDto,
   TreeholeListDto,
@@ -19,6 +33,7 @@ import { TreeholeDaoService } from '@/dao/treehole/treehole-dao.service'
 import { Roles } from '@/common/decorators/roles.decorator'
 import { Police } from '@/common/guards/policies.guard'
 import { CreateHolePolicyHandler } from '@/modules/treehole/policies/create.police'
+import { HolePostLimitGuard } from '@/common/guards/hole.guard'
 
 @ApiTags('树洞模块')
 @ApiBearerAuth()
@@ -56,20 +71,15 @@ export class TreeholeController {
   }
 
   @CheckPolicies(CreateHolePolicyHandler)
+  @UseGuards(HolePostLimitGuard)
   @Post('create')
-  async createHole(
-    @Body() dto: CreateHoleDto,
-    @Req() req: Request,
-  ) {
+  async createHole(@Body() dto: CreateHoleDto, @Req() req: Request) {
     return this.treeholeService.createHole(dto, req.user)
   }
 
   @CheckPolicies(DeleteHolePolicyHandler)
   @Delete('remove')
-  async removeHole(
-    @Body() dto: IsValidHoleIdDto,
-    @Req() req: Request,
-  ) {
+  async removeHole(@Body() dto: IsValidHoleIdDto, @Req() req: Request) {
     return this.treeholeService.removeHole(dto)
   }
 
@@ -85,10 +95,7 @@ export class TreeholeController {
 
   @CheckPolicies(DeleteCommentPolicyHandler)
   @Delete('comment')
-  async removeComment(
-    @Body() dto: RemoveHoleCommentDto,
-    @Req() req: Request,
-  ) {
+  async removeComment(@Body() dto: RemoveHoleCommentDto, @Req() req: Request) {
     return this.treeholeService.removeComment(dto, req.user)
   }
 

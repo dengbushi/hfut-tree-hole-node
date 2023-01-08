@@ -1,3 +1,5 @@
+import Mongoose from 'mongoose'
+
 interface Base {
   _id: string
   content: string
@@ -22,12 +24,21 @@ export interface ITreeholeListPipeLineStage extends Base {
   }
 }
 
+
+
+
 interface Comment {
+  _id: Mongoose.Types.ObjectId
+  parentId?: Mongoose.Types.ObjectId
   userId: number
   user?: { username?: string }
   content: string
   createTime: string
   isOwner: boolean
+  replyTo?: null | Mongoose.Types.ObjectId
+  replies?: (Omit<Comment, 'replies' | 'userId' | '_id'> & {
+    members?: Comment['user'][]
+  })[]
 }
 
 interface User {

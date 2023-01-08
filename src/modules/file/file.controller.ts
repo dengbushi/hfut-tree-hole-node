@@ -1,5 +1,6 @@
 import {
-  Controller, Get,
+  Controller,
+  Get,
   HttpStatus,
   Inject,
   ParseFilePipeBuilder,
@@ -29,17 +30,19 @@ export class FileController {
           fileType: 'image',
         })
         .addMaxSizeValidator({
-          maxSize: 5 * 1024 * 1024,
+          maxSize: 2 * 1024 * 1024,
         })
         .build({
           errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-        }),
-    ) file: Express.Multer.File) {
-    return this.fileService.test()
+        })
+    )
+    file: Express.Multer.File
+  ) {
+    return {
+      file: file.buffer,
+    }
   }
 
   @Get('/sts')
-  generateSecretKey() {
-
-  }
+  generateSecretKey() {}
 }

@@ -1,9 +1,18 @@
-import { CanActivate, ExecutionContext, Inject, Injectable, UseGuards } from '@nestjs/common'
+import {
+  CanActivate,
+  ExecutionContext,
+  Inject,
+  Injectable,
+  UseGuards,
+} from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { Request } from 'express'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
-import { CHECK_POLICIES_KEY, PoliceHandler } from '@/common/decorators/CheckPolicies.decorator'
+import {
+  CHECK_POLICIES_KEY,
+  PoliceHandler,
+} from '@/common/decorators/CheckPolicies.decorator'
 import { AppAbility, CaslAbilityFactory } from '@/modules/casl/casl.factory'
 import { TreeholeDaoService } from '@/dao/treehole/treehole-dao.service'
 import { Holes, HolesDocument } from '@/schema/treehole/holes.schema'
@@ -22,20 +31,20 @@ export class PoliciesGuard implements CanActivate {
 
   constructor(
     private reflector: Reflector,
-    private caslAbilityFactory: CaslAbilityFactory,
+    private caslAbilityFactory: CaslAbilityFactory
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const policyHandlers
-      = this.reflector.get<PoliceHandler[]>(
+    const policyHandlers =
+      this.reflector.get<PoliceHandler[]>(
         CHECK_POLICIES_KEY,
-        context.getHandler(),
+        context.getHandler()
       ) || []
 
     const req = context.switchToHttp().getRequest() as Request
     const ability = await this.caslAbilityFactory.createForUser(req.user)
 
-    return policyHandlers.every(async(handler) => {
+    return policyHandlers.every(async (handler) => {
       // eslint-disable-next-line no-useless-catch
       try {
         return await this.execPolicyHandler(handler, ability, req, this)
@@ -49,7 +58,7 @@ export class PoliciesGuard implements CanActivate {
     handler: PoliceHandler,
     ability: AppAbility,
     req: Request,
-    models: PoliciesGuard,
+    models: PoliciesGuard
   ) {
     let fn
 

@@ -1,11 +1,14 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model, PipelineStage } from 'mongoose'
-import { Holes, HolesDocument } from '../../schema/treehole/holes.schema'
-import { TreeholeListDto } from '../../modules/treehole/dto/treehole.dto'
-import { unset } from '../../shared/utils/object'
-import { ITreeholeDetailPipeLineStage, ITreeholeListPipeLineStage } from './types'
+import {
+  ITreeholeDetailPipeLineStage,
+  ITreeholeListPipeLineStage,
+} from './types'
 import { isStarHole } from './utils'
+import { Holes, HolesDocument } from '@/schema/treehole/holes.schema'
+import { TreeholeListDto } from '@/modules/treehole/dto/treehole.dto'
+import { unset } from '@/shared/utils/object'
 
 @Injectable()
 export class TreeholeDaoService {
@@ -30,11 +33,6 @@ export class TreeholeDaoService {
       },
       {
         $unwind: '$user',
-      },
-      {
-        $match: {
-          delete: false,
-        },
       },
       {
         $addFields: {
@@ -78,33 +76,41 @@ export class TreeholeDaoService {
     ]
 
     const mode = dto.mode
-
-    if (mode === 'hot') {
-      pipeLineStage.unshift({
-        $match: {
-          stars: {
-            $gt: 0,
-          },
-        },
-      })
-    } else if (mode.includes('timeline')) {
-      const sortIdx = pipeLineStage.findIndex(item => item === sort)
+    //
+    // if (mode === 'hot') {
+    //   pipeLineStage.unshift({
+    //     $match: {
+    //       stars: {
+    //         $gt: 0,
+    //       },
+    //     },
+    //   })
+    // }
+    if (mode.includes('timeline')) {
+      const sortIdx = pipeLineStage.findIndex((item) => item === sort)
       pipeLineStage.splice(sortIdx, 1, { $sort: { createdTime: -1 } })
     }
 
     try {
-      const queryRes = await this.holesModel.aggregate([...pipeLineStage, ...[{ $skip: Math.abs(skip) }, { $limit: dto.limit }]]) as ITreeholeListPipeLineStage[]
+      const queryRes = (await this.holesModel.aggregate([
+        ...pipeLineStage,
+        ...[{ $skip: Math.abs(skip) }, { $limit: dto.limit }],
+      ])) as ITreeholeListPipeLineStage[]
 
       const pageRes = await this.holesModel.aggregate(pipeLineStage)
 
       const data = queryRes.map((item) => {
         item.comments.data = item.comments.data.map((commentItem) => {
-          const user = item.comments_user.find(userItem => userItem.studentId)!
+          const user = item.comments_user.find(
+            (userItem) => userItem.studentId
+          )!
+
+          const isOwner = commentItem.userId === user.studentId
 
           commentItem = {
             ...commentItem,
             user: {
-              username: user.username,
+              username: isOwner ? '洞主' : user.username,
             },
           }
 
@@ -132,74 +138,106 @@ export class TreeholeDaoService {
   }
 
   async getDetail(id: number, userId: number) {
-    const pipeLineStage: PipelineStage[] = [{
-      $match: {
-        id,
-        delete: false,
-      },
-    }, {
-      $lookup: {
-        from: 'users',
-        localField: 'userId',
-        foreignField: 'studentId',
-        as: 'user',
-      },
-    }, {
-      $unwind: '$user',
-    }, {
-      $lookup: {
-        from: 'users',
-        localField: 'comments.userId',
-        foreignField: 'studentId',
-        as: 'comments_user',
-      },
-    },
-    {
-      $addFields: {
-        comments_length: {
-          $size: '$comments',
+    const pipeLineStage: PipelineStage[] = [
+      {
+        $match: {
+          id,
         },
       },
-    },
-    {
-      $project: {
-        userId: 0,
-        _id: 0,
-        delete: false,
-        user: {
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: 'studentId',
+          as: 'user',
+        },
+      },
+      {
+        $unwind: '$user',
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'comments.userId',
+          foreignField: 'studentId',
+          as: 'comments_user',
+        },
+      },
+      {
+        $addFields: {
+          comments_length: {
+            $size: '$comments',
+          },
+        },
+      },
+      {
+        $project: {
+          userId: 0,
           _id: 0,
-          password: 0,
-          holeIds: 0,
+          user: {
+            _id: 0,
+            password: 0,
+            holeIds: 0,
+            __v: 0,
+            roles: 0,
+          },
           __v: 0,
-          roles: 0,
+          updatedTime: 0,
         },
-        __v: 0,
-        updatedTime: 0,
       },
-    }]
+    ]
 
-    const res = (await this.holesModel.aggregate(pipeLineStage))[0] as ITreeholeDetailPipeLineStage
+    const res = (
+      await this.holesModel.aggregate(pipeLineStage)
+    )[0] as ITreeholeDetailPipeLineStage
+    const repliesTo: ITreeholeDetailPipeLineStage['comments'] = []
 
     res.isOwner = res.user.studentId === userId
+    res.comments = res.comments
+      .map((item) => {
+        const user = res.comments_user.filter(
+          (commentItem) => commentItem.studentId === item.userId
+        )[0]
 
-    res.comments = res.comments.map((item) => {
-      const user = res.comments_user.filter(commentItem => commentItem.studentId === item.userId)[0]
+        const isOwner = item.userId === res.user.studentId
+        if (item.replyTo) {
+          repliesTo.push({
+            ...item,
+            isOwner,
+            user: { username: isOwner ? '洞主' : user.username },
+          })
+          // eslint-disable-next-line array-callback-return
+          return
+        }
 
-      unset(item, 'userId')
+        unset(item, 'userId')
+        item = {
+          ...item,
+          isOwner: item.userId === res.user.studentId,
+          user: { username: isOwner ? '洞主' : user.username },
+          replies: [],
+        }
 
-      item = {
-        ...item,
-        isOwner: user.studentId === userId,
-        user: {
-          username: user.username,
-        },
+        return item
+      })
+      .filter(Boolean)
+
+    repliesTo.forEach((r) => {
+      const comment = res.comments.find((c) => c._id.equals(r.parentId))
+      if (comment) {
+        unset(r, 'userId')
+        const members = [comment.user]
+        if (comment.user.username === res.user.username) {
+          comment.user.username = '洞主'
+        }
+        comment.replies.push({
+          ...r,
+          members,
+        })
       }
-
-      return item
     })
 
     unset(res.user, 'studentId')
-
     unset(res, 'comments_user')
 
     res.isStar = isStarHole(res.starUserIds, userId)

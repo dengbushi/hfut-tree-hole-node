@@ -1,7 +1,11 @@
-import { Controller } from '@nestjs/common'
+import { Controller, Get } from '@nestjs/common'
 import { Roles } from '@/common/decorators/roles.decorator'
-import { Role } from '@/modules/role/role.enum'
 
-@Roles([Role.Admin])
+@Roles()
 @Controller('notify')
-export class NotifyController {}
+export class NotifyController {
+  @Get('unread')
+  getUnread() {
+
+  }
+}

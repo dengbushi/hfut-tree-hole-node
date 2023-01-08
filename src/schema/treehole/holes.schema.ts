@@ -7,19 +7,25 @@ export type HolesDocument = Holes & Document
 @Schema()
 export class Comment {
   @Prop(mongoose.Types.ObjectId)
-    _id: mongoose.Types.ObjectId
+  _id: mongoose.Types.ObjectId
+
+  /*
+   *  用于定位某条“回复”而非留言时的 parent comment
+   */
+  @Prop(mongoose.Types.ObjectId)
+  parentId?: mongoose.Types.ObjectId
 
   @Prop({ type: Number, index: 1 })
-    userId: number
+  userId: number
 
   @Prop(String)
-    content: string
+  content: string
 
   @Prop(Date)
-    createTime: Date
+  createTime: Date
 
   @Prop(mongoose.Types.ObjectId)
-    replyTo?: mongoose.Types.ObjectId
+  replyTo?: mongoose.Types.ObjectId
 
   constructor(attrs) {
     Object.assign(this, attrs)
@@ -29,31 +35,28 @@ export class Comment {
 @BaseSchema()
 export class Holes {
   @Prop({ type: Number, index: 1, required: true })
-    id: number
+  id: number
 
   @Prop({ type: Number, index: 1, required: true })
-    userId: number
+  userId: number
 
   @Prop({ type: String, required: true })
-    content: string
+  content: string
 
   @Prop({ type: Number, index: 1, default: 0 })
-    stars: number
+  stars: number
 
   @Prop({ type: [Number], default: [] })
-    starUserIds: number[]
+  starUserIds: number[]
 
   @Prop({ type: [String] })
-    imgs: string[]
+  imgs: string[]
 
   @Prop({ type: [{ type: Object, ref: () => Comment }] })
-    comments: Comment[]
+  comments: Comment[]
 
   @Prop({ type: [{ type: Object }] })
-    options?: { option: string; voteNum: number }[]
-
-  @Prop({ type: Boolean, index: 1, default: false })
-    delete: boolean
+  options?: { option: string; voteNum: number }[]
 
   constructor(props: { userId: number }) {
     Object.assign(this, props)

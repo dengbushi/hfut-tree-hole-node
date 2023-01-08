@@ -7,25 +7,25 @@ export type UsersDocument = Users & Document
 @Schema()
 export class Users {
   @Prop({ type: Number, index: 1 })
-    studentId: number
+  studentId: number
 
   @Prop({ type: String, index: 1 })
-    username: string
+  username: string
 
   @Prop(String)
-    password: string
+  password: string
 
   @Prop(String)
-    avatar: string
+  avatar: string
 
   @Prop({ type: [{ type: Mongoose.SchemaTypes.Number }] })
-    holeIds: number[]
+  holeIds: number[]
 
   @Prop({ type: [{ type: Object }] })
-    loginInfo: { ip: string; date: Date; ua: string }
+  loginInfo: { ip: string; date: Date; ua: string }
 
   @Prop({ type: [{ type: Object }] })
-    roles: Role[]
+  roles: Role[]
 }
 
 export const UsersSchema = SchemaFactory.createForClass(Users)

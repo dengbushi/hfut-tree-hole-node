@@ -27,7 +27,7 @@ export const treeholeModeDefaultData: TTreeholeMode[] = [
 @Schema()
 export class TreeholeMode {
   @Prop()
-    modes: TTreeholeMode[]
+  modes: TTreeholeMode[]
 }
 
 export const TreeholeModeSchema = SchemaFactory.createForClass(TreeholeMode)
