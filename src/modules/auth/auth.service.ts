@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotAcceptableException, UnauthorizedException } from '@nestjs/common'
+import {
+  Inject,
+  Injectable,
+  NotAcceptableException,
+  UnauthorizedException,
+} from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
@@ -14,6 +19,7 @@ import { createResponse } from '@/shared/utils/create'
 import { Users, UsersDocument } from '@/schema/user/user.schema'
 import { loginVerifyRequest } from '@/request/loginVerify'
 import { isArray } from '@/shared/utils/is'
+import { encryptPassword, verifyPassword } from '@/modules/auth/auth.utils'
 
 @Injectable()
 export class AuthService {
@@ -30,16 +36,19 @@ export class AuthService {
   private readonly userModel: Model<UsersDocument>
 
   async login(dto: LoginDataDto) {
-    const user = await this.userService.findOne(dto)
+    const user = await this.userModel.findOne({
+      studentId: dto.studentId,
+    })
 
-    if (!user) {
+    const isPasswordCorrect = await verifyPassword(user.password, dto.password)
+
+    if (!isPasswordCorrect) {
       throw new UnauthorizedException('密码错误')
     }
 
-    // TODO login info
-    // const ua = parseUA(req.headers)
-
-    return createResponse('登录成功', { token: this.signToken(user.studentId, Role.User) })
+    return createResponse('登录成功', {
+      token: this.signToken(user.studentId, Role.User),
+    })
   }
 
   async register(dto: RegisterDataDto) {
@@ -60,27 +69,38 @@ export class AuthService {
     const roles = [Role.User]
     const user = await new this.userModel({
       ...dto,
+      password: await encryptPassword(dto.password),
       loginInfo: [],
       roles,
     }).save()
 
     if (user) {
-      return createResponse('注册成功', { token: this.signToken(user.studentId, roles) })
+      return createResponse('注册成功', {
+        token: this.signToken(user.studentId, roles),
+      })
     }
   }
 
   async forget(forgetDataDto: ForgetDataDto): Promise<any> {
-    const isUserExisted = await this.userService.findOne(forgetDataDto.studentId)
+    const isUserExisted = await this.userService.findOne(
+      forgetDataDto.studentId
+    )
     if (!isUserExisted) {
       throw new NotAcceptableException('该学号未注册')
     }
 
     await this.verifyHfutAccount(forgetDataDto)
 
-    const updatedUser = await this.userModel.updateOne({ studentId: forgetDataDto.studentId }, { password: forgetDataDto.password })
+    const updatedUser = await this.userModel.updateOne(
+      { studentId: forgetDataDto.studentId },
+      { password: await encryptPassword(forgetDataDto.password) }
+    )
 
     if (updatedUser) {
-      return createResponse('修改密码成功', { token: this.signToken(forgetDataDto.studentId, Role.User), updatedUser })
+      return createResponse('修改密码成功', {
+        token: this.signToken(forgetDataDto.studentId, Role.User),
+        updatedUser,
+      })
     } else {
       throw new NotAcceptableException('修改密码失败')
     }
@@ -96,10 +116,13 @@ export class AuthService {
 
   async verifyHfutAccount(dto: RegisterDataDto | ForgetDataDto) {
     try {
-      await loginVerifyRequest(`${this.configService.get('HFUTAPI_URL')}/login`, {
-        studentId: dto.studentId,
-        hfutPassword: dto.hfutPassword,
-      } as RegisterDataDto)
+      await loginVerifyRequest(
+        `${this.configService.get('HFUTAPI_URL')}/login`,
+        {
+          studentId: dto.studentId,
+          hfutPassword: dto.hfutPassword,
+        } as RegisterDataDto
+      )
     } catch (err) {
       const msg = (err as AxiosError).response?.data?.msg
       throw new NotAcceptableException(`信息门户${msg || '登录验证请求错误'}`)

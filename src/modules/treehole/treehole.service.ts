@@ -54,9 +54,6 @@ export class TreeholeService {
   @Inject(WINSTON_MODULE_NEST_PROVIDER)
   private readonly logger: LoggerService
 
-  @Inject(CACHE_MANAGER)
-  private cacheManager: Cache
-
   constructor(
     @InjectRedis()
     private readonly redis: Redis,
@@ -83,6 +80,8 @@ export class TreeholeService {
       throw new InternalServerErrorException('获取树洞详情失败')
     }
   }
+
+  async getComment() {}
 
   async createHole(dto: CreateHoleDto, user: IUser) {
     const transactionSession = await this.connection.startSession()
@@ -153,6 +152,8 @@ export class TreeholeService {
     try {
       const id = new mongoose.Types.ObjectId()
       const isReply = !!(dto as ReplyCommentDto).commentId
+
+      const hole = await this.holesModel.findOne({ id: dto.id })
 
       await this.holesModel.updateOne(
         { id: dto.id },
@@ -272,5 +273,7 @@ export class TreeholeService {
     }
   }
 
-  async search(dto: HoleSearchDto) {}
+  async search(dto: HoleSearchDto) {
+    const isIdSearch = !isNaN(parseInt(dto.keywords))
+  }
 }

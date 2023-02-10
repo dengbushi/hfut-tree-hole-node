@@ -3,10 +3,10 @@ import { PoliceHandlerCallback } from '@/common/decorators/CheckPolicies.decorat
 import { Action } from '@/common/enums/action.enum'
 import { Holes } from '@/schema/treehole/holes.schema'
 
-export const CreateHolePolicyHandler: PoliceHandlerCallback = async(
+export const CreateHolePolicyHandler: PoliceHandlerCallback = async (
   ability,
   req,
-  guard,
+  guard
 ) => {
   const hole = await guard.treeholeDaoService.findById(req.body.id)
 

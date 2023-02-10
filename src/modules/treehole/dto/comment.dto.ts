@@ -4,11 +4,14 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator'
-import { CACHE_MANAGER, Inject, Injectable, NotFoundException } from '@nestjs/common'
+import {
+  CACHE_MANAGER,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Cache } from 'cache-manager'
 import { Holes, HolesDocument } from '@/schema/treehole/holes.schema'
-import { cacheKey } from '@/shared/constant/cacheKeys'
 import { createClassValidator } from '@/shared/utils/create'
 
 @ValidatorConstraint({ async: true })
@@ -17,14 +20,10 @@ export class ValidateCommentId implements ValidatorConstraintInterface {
   @InjectModel(Holes.name)
   private readonly holesModel: Model<HolesDocument>
 
-  @Inject(CACHE_MANAGER)
-  private cacheManager: Cache
-
   async validate(id: string) {
     const commentId = new mongoose.Types.ObjectId(id)
 
     const isCommentExist = await this.holesModel.findOne({
-      delete: false,
       comments: {
         $elemMatch: { _id: commentId },
       },
@@ -33,8 +32,6 @@ export class ValidateCommentId implements ValidatorConstraintInterface {
     if (!isCommentExist) {
       throw new NotFoundException('该评论不存在')
     }
-
-    await this.cacheManager.set(cacheKey.HoleComment, isCommentExist)
 
     return true
   }
@@ -45,5 +42,5 @@ export const IsValidCommentId = createClassValidator(ValidateCommentId)
 export class IsValidCommentIdDto {
   @IsValidCommentId()
   @IsString()
-    id: string
+  id: string
 }

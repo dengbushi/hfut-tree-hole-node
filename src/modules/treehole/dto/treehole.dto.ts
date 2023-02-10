@@ -21,7 +21,7 @@ export class TreeholeListDto extends PaginationDto {
   @IsTreeholeMode({
     message: 'mode不存在',
   })
-    mode: string
+  mode: string
 }
 
 export class TreeholeDetailDto extends IsValidHoleIdDto {}
@@ -33,7 +33,7 @@ export class CreateHoleDto {
   @MaxLength(TreeholeConst.maxContentLength, {
     message: `树洞正文字数不能超过${TreeholeConst.maxContentLength}`,
   })
-    content: string
+  content: string
 
   @ApiProperty({ type: String, description: '选项' })
   @ArrayMaxSize(5, {
@@ -54,10 +54,10 @@ export class CreateHoleDto {
     },
     {
       message: '每项选项最长只能为20字哦',
-    },
+    }
   )
   @IsOptional()
-    options?: string[]
+  options?: string[]
 }
 
 export class CreateCommentDto extends IsValidHoleIdDto {
@@ -67,14 +67,14 @@ export class CreateCommentDto extends IsValidHoleIdDto {
   @MaxLength(TreeholeConst.maxCommentLength, {
     message: `树洞正文字数不能超过${TreeholeConst.maxCommentLength}`,
   })
-    content: string
+  content: string
 }
 
 export class ReplyCommentDto extends CreateCommentDto {
   @ApiProperty({ type: String, description: '评论id' })
   @IsMongoId()
   @IsNotEmpty()
-    commentId: string
+  commentId: string
 }
 
 export class StarHoleDto extends IsValidHoleIdDto {}
@@ -84,5 +84,5 @@ export class RemoveHoleCommentDto extends IsValidHoleIdDto {
   @IsString()
   @IsNotEmpty()
   @IsMongoId()
-    commentId: string
+  commentId: string
 }

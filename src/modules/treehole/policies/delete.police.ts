@@ -3,10 +3,10 @@ import { Action } from '@/common/enums/action.enum'
 import { Comment, Holes } from '@/schema/treehole/holes.schema'
 import { PoliceHandlerCallback } from '@/common/decorators/CheckPolicies.decorator'
 
-export const DeleteHolePolicyHandler: PoliceHandlerCallback = async(
+export const DeleteHolePolicyHandler: PoliceHandlerCallback = async (
   ability,
   req,
-  guard,
+  guard
 ) => {
   const hole = await guard.treeholeDaoService.findById(req.body.id)
 
@@ -23,9 +23,9 @@ export const DeleteHolePolicyHandler: PoliceHandlerCallback = async(
   return res
 }
 
-export const DeleteCommentPolicyHandler: PoliceHandlerCallback = async(
+export const DeleteCommentPolicyHandler: PoliceHandlerCallback = async (
   ability,
-  req,
+  req
 ) => {
   const canDeleted = ability.can(Action.Delete, new Comment(req.user))
 

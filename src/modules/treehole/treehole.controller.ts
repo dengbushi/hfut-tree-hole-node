@@ -65,6 +65,9 @@ export class TreeholeController {
     return this.treeholeService.getDetail(dto, req.user)
   }
 
+  @Get('detail/comment')
+  async getComment(@Query() dto: IsValidHoleIdDto, @Req() req: Request) {}
+
   @Get('search')
   async searchHole(@Query() dto: HoleSearchDto) {
     return this.treeholeService.search(dto)

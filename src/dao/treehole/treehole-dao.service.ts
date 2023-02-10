@@ -61,6 +61,7 @@ export class TreeholeDaoService {
           _id: 0,
           userId: 0,
           delete: 0,
+          starUserIds: 0,
           user: {
             _id: 0,
             studentId: 0,
@@ -68,6 +69,7 @@ export class TreeholeDaoService {
             holeIds: 0,
             __v: 0,
             roles: 0,
+            loginInfo: 0,
           },
           __v: 0,
           updatedTime: 0,
@@ -76,19 +78,20 @@ export class TreeholeDaoService {
     ]
 
     const mode = dto.mode
-    //
-    // if (mode === 'hot') {
-    //   pipeLineStage.unshift({
-    //     $match: {
-    //       stars: {
-    //         $gt: 0,
-    //       },
-    //     },
-    //   })
-    // }
-    if (mode.includes('timeline')) {
-      const sortIdx = pipeLineStage.findIndex((item) => item === sort)
-      pipeLineStage.splice(sortIdx, 1, { $sort: { createdTime: -1 } })
+
+    if (mode === 'hot') {
+      pipeLineStage.unshift({
+        $match: {
+          stars: {
+            $gt: 0,
+          },
+        },
+      })
+    } else if (mode.includes('timeline')) {
+      // TODO 使用enum重构
+      pipeLineStage.unshift({
+        $sort: { createTime: mode === 'timeline-reverse' ? 1 : -1 },
+      })
     }
 
     try {
@@ -192,7 +195,7 @@ export class TreeholeDaoService {
     )[0] as ITreeholeDetailPipeLineStage
     const repliesTo: ITreeholeDetailPipeLineStage['comments'] = []
 
-    res.isOwner = res.user.studentId === userId
+    res.isYourHole = res.user.studentId === userId
     res.comments = res.comments
       .map((item) => {
         const user = res.comments_user.filter(
@@ -203,7 +206,6 @@ export class TreeholeDaoService {
         if (item.replyTo) {
           repliesTo.push({
             ...item,
-            isOwner,
             user: { username: isOwner ? '洞主' : user.username },
           })
           // eslint-disable-next-line array-callback-return
@@ -213,7 +215,7 @@ export class TreeholeDaoService {
         unset(item, 'userId')
         item = {
           ...item,
-          isOwner: item.userId === res.user.studentId,
+          isYourComment: user.studentId === userId,
           user: { username: isOwner ? '洞主' : user.username },
           replies: [],
         }

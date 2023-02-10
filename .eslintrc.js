@@ -28,6 +28,7 @@ module.exports = {
       "@typescript-eslint/brace-style": "off",
       "@typescript-eslint/indent": "off",
       "@typescript-eslint/consistent-type-imports": "off",
+      "@typescript-eslint/no-empty-interface": "off",
       "new-cap": "off"
     }
   }]

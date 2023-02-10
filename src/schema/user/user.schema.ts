@@ -18,9 +18,6 @@ export class Users {
   @Prop(String)
   avatar: string
 
-  @Prop({ type: [{ type: Mongoose.SchemaTypes.Number }] })
-  holeIds: number[]
-
   @Prop({ type: [{ type: Object }] })
   loginInfo: { ip: string; date: Date; ua: string }
 

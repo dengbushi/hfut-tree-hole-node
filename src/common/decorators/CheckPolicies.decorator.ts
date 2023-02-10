@@ -3,7 +3,11 @@ import { Request } from 'express'
 import { AppAbility } from '@/modules/casl/casl.factory'
 import { PoliciesGuard } from '@/common/guards/policies.guard'
 
-export type PoliceHandlerCallback = (ability: AppAbility, request: Request, guard: PoliciesGuard) => boolean | Promise<boolean>
+export type PoliceHandlerCallback = (
+  ability: AppAbility,
+  request: Request,
+  guard: PoliciesGuard
+) => boolean | Promise<boolean>
 
 export interface IPolicyHandler {
   handle: PoliceHandlerCallback

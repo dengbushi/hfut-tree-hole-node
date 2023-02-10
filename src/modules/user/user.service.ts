@@ -1,4 +1,9 @@
-import { Inject, Injectable, InternalServerErrorException, NotAcceptableException } from '@nestjs/common'
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  NotAcceptableException,
+} from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { UpdateDto } from './dto/update.dto'
@@ -25,7 +30,10 @@ export class UserService {
 
   async getUserInfo(user: IUser): Promise<any> {
     try {
-      const userData = await this.findOne(user.studentId, ['password', 'holeIds', 'loginInfo'])
+      const userData = await this.findOne(user.studentId, [
+        'password',
+        'loginInfo',
+      ])
       const holes = await this.getHoles(user)
       const stars = await this.getHolesStar(user)
 
@@ -50,11 +58,14 @@ export class UserService {
     }
 
     try {
-      await this.usersModel.updateOne({ studentId: user.studentId }, {
-        $set: {
-          ...dto,
-        },
-      })
+      await this.usersModel.updateOne(
+        { studentId: user.studentId },
+        {
+          $set: {
+            ...dto,
+          },
+        }
+      )
 
       return createResponse('用户信息更新成功')
     } catch (err) {
@@ -63,24 +74,30 @@ export class UserService {
   }
 
   async getHoles(user: IUser) {
-    const list = await this.holesModel.find({ userId: user.studentId }, { starUserIds: 0, comments: 0 })
+    const list = await this.holesModel.find(
+      { userId: user.studentId },
+      { starUserIds: 0, comments: 0 }
+    )
 
     return createResponse('获取用户树洞列表成功', list)
   }
 
   async getHolesStar(user: IUser) {
-    const list = await this.holesModel.find({
-      starUserIds: {
-        $elemMatch: { $eq: user.studentId },
+    const list = await this.holesModel.find(
+      {
+        starUserIds: {
+          $elemMatch: { $eq: user.studentId },
+        },
       },
-    }, { starUserIds: 0, userId: 0, comments: 0 })
+      { starUserIds: 0, userId: 0, comments: 0 }
+    )
 
     return createResponse('获取用户树洞star列表成功', list)
   }
 
   async findOne<T extends '_id' | '__v' | keyof Users>(
     payload: number | Partial<LoginDataDto> | Partial<RegisterDataDto>,
-    filterFields: T[] | T = [] as T[],
+    filterFields: T[] | T = [] as T[]
   ) {
     let user: Users
 

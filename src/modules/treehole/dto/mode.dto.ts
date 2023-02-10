@@ -14,14 +14,13 @@ import { createClassValidator } from '@/shared/utils/create'
 export class IsModeExist implements ValidatorConstraintInterface {
   constructor(
     @InjectModel(TreeholeMode.name)
-    private readonly treeholeModeModel: Model<TreeholeMode>,
-  ) {
-  }
+    private readonly treeholeModeModel: Model<TreeholeMode>
+  ) {}
 
   async validate(mode: any, args: ValidationArguments) {
     const res = (await this.treeholeModeModel.findOne()).modes
 
-    return !!res.map(item => item.value).includes(mode)
+    return !!res.map((item) => item.value).includes(mode)
   }
 }
 

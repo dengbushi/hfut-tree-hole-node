@@ -12,9 +12,9 @@ interface Base {
   isStar: boolean
 }
 
-export interface ITreeholeDetailPipeLineStage extends Base{
+export interface ITreeholeDetailPipeLineStage extends Base {
   comments: Comment[]
-  isOwner: boolean
+  isYourHole: boolean
 }
 
 export interface ITreeholeListPipeLineStage extends Base {
@@ -24,9 +24,6 @@ export interface ITreeholeListPipeLineStage extends Base {
   }
 }
 
-
-
-
 interface Comment {
   _id: Mongoose.Types.ObjectId
   parentId?: Mongoose.Types.ObjectId
@@ -34,7 +31,7 @@ interface Comment {
   user?: { username?: string }
   content: string
   createTime: string
-  isOwner: boolean
+  isYourComment: boolean
   replyTo?: null | Mongoose.Types.ObjectId
   replies?: (Omit<Comment, 'replies' | 'userId' | '_id'> & {
     members?: Comment['user'][]

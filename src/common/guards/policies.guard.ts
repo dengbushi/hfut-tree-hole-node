@@ -17,10 +17,6 @@ import { AppAbility, CaslAbilityFactory } from '@/modules/casl/casl.factory'
 import { TreeholeDaoService } from '@/dao/treehole/treehole-dao.service'
 import { Holes, HolesDocument } from '@/schema/treehole/holes.schema'
 
-export interface PoliciesModel {
-  holes: Model<HolesDocument>
-}
-
 @Injectable()
 export class PoliciesGuard implements CanActivate {
   @Inject()
@@ -44,14 +40,14 @@ export class PoliciesGuard implements CanActivate {
     const req = context.switchToHttp().getRequest() as Request
     const ability = await this.caslAbilityFactory.createForUser(req.user)
 
-    return policyHandlers.every(async (handler) => {
-      // eslint-disable-next-line no-useless-catch
+    for (const handler of policyHandlers) {
       try {
-        return await this.execPolicyHandler(handler, ability, req, this)
+        await this.execPolicyHandler(handler, ability, req, this)
       } catch (err) {
         return false
       }
-    })
+    }
+    return true
   }
 
   private async execPolicyHandler(

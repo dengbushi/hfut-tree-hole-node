@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Inject, Patch, Post, Req} from '@nestjs/common'
+import { Body, Controller, Get, Inject, Patch, Req } from '@nestjs/common'
 import { Request } from 'express'
 import { ApiTags } from '@nestjs/swagger'
 import { UserService } from './user.service'
@@ -28,10 +28,8 @@ export class UserController {
   }
 
   @Patch('update')
-  async update(
-    @Req() req: Request,
-    @Body() dto: UpdateDto,
-  ) {
+  async update(@Req() req: Request, @Body() dto: UpdateDto) {
+    console.log(req.user)
     return this.userService.update(dto, req.user)
   }
 }
